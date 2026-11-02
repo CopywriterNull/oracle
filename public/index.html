@@ -4,366 +4,778 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Oracle</title>
-<meta name="description" content="Find your quiet sign. Discover soft, AI‑powered guidance from Liu‑Yao — ancient Chinese I‑Ching divination — and Tarot. When you feel unsure amid choices, get a small nudge to move forward.">
+<meta name="description" content="Find your quiet sign. Soft, AI-powered guidance from Liu-Yao, ancient Chinese I Ching divination, and Tarot.">
 <meta name="theme-color" content="#1d2347">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Oracle">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Jost:wght@300;400;500&family=Noto+Serif+SC:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Jost:wght@400;500&family=Noto+Serif+SC:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{
-  /* Midnight Lace: navy starry sky, cream lace cards, gold */
-  --night:#1d2347; --page-ink:#f4ecdc; --page-muted:#b9b3d6;
-  --card:#fbf6ec; --ink:#2b2740; --muted:#857e9c; --line:#d8c9a8;
-  --rose:#f2d8a7; --rose-deep:#a8822f; --sage:#f2d8a7; --sage-deep:#a8822f; --soft:#f3ead6;
+  /* Midnight Lace: the night is for asking, cream lace paper is for the answer */
+  --night:#1d2347; --page-ink:#f6efe0; --page-muted:#d3cee8;
+  --card:#fbf6ec; --ink:#2b2740; --muted:#6f6888; --line:#d8c9a8; --soft:#f3ead6;
+  --gold:#f2d8a7; --gold-deep:#a8822f;
   --serif:'Instrument Serif',Georgia,serif; --sans:'Jost',system-ui,sans-serif; --zh:'Noto Serif SC',serif;
+  --spark:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M10 0C11 7 13 9 20 10 13 11 11 13 10 20 9 13 7 11 0 10 7 9 9 7 10 0Z'/%3E%3C/svg%3E");
 }
+/* card backs: one more unlocked per completed constellation */
+body,.bk-dots{--back-bg:radial-gradient(#f2d8a7 16%,transparent 17%) 0 0/14px 14px,radial-gradient(#f2d8a7 16%,transparent 17%) 7px 7px/14px 14px,#2d2f5e}
+body[data-back=stars],.bk-stars{--back-bg:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28'%3E%3Cpath d='M8 2C8.4 6 9.6 7.2 14 8 9.6 8.8 8.4 10 8 14 7.6 10 6.4 8.8 2 8 6.4 7.2 7.6 6 8 2Z' fill='%23f2d8a7'/%3E%3Ccircle cx='21' cy='20' r='1.4' fill='%23f6efe0'/%3E%3C/svg%3E") 0 0/24px 24px,#161a3d}
+body[data-back=lace],.bk-lace{--back-bg:radial-gradient(circle,transparent 4px,#f6efe0 4.5px 5.5px,transparent 6px) 0 0/16px 16px,radial-gradient(#f2d8a7 20%,transparent 22%) 8px 8px/16px 16px,#5a3357}
+body[data-back=moon],.bk-moon{--back-bg:radial-gradient(circle at 11px 9px,#22264f 5px,transparent 5.5px) 0 0/24px 24px,radial-gradient(circle at 9px 11px,#f2d8a7 6px,transparent 6.5px) 0 0/24px 24px,#22264f}
+
 *{box-sizing:border-box;margin:0}
-body{background:linear-gradient(#1d2347,#2d2f5e 60%,#4a3f6b) fixed var(--night);color:var(--page-ink);font-family:var(--sans);font-weight:300;-webkit-font-smoothing:antialiased;min-height:100dvh}
-.sky{position:fixed;inset:0;pointer-events:none;z-index:0}
-.sky i{position:absolute;display:block;color:#f2d8a7;animation:twinkle 3.2s ease-in-out infinite}
-.sky i.dot{border-radius:50%;background:#f4ecdc}
+body{background:linear-gradient(#1d2347,#2d2f5e 60%,#4a3f6b) fixed var(--night);color:var(--page-ink);font:400 16px/1.5 var(--sans);-webkit-font-smoothing:antialiased;min-height:100dvh}
+button{font:inherit;color:inherit}
+[hidden]{display:none!important}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* sky: three drifting layers, dimmer behind the text column */
+.sky{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;
+  -webkit-mask:linear-gradient(90deg,#000 0 8%,rgba(0,0,0,.35) 30% 70%,#000 92%);mask:linear-gradient(90deg,#000 0 8%,rgba(0,0,0,.35) 30% 70%,#000 92%)}
+.layer{position:absolute;inset:-30px;animation:drift 50s ease-in-out infinite alternate}
+.layer:nth-child(2){animation-duration:75s;animation-direction:alternate-reverse}
+.layer:nth-child(3){animation-duration:110s}
+@keyframes drift{to{translate:-18px -26px}}
+.sky i{position:absolute;display:block;color:var(--gold);animation:twinkle 3.2s ease-in-out infinite}
+.sky i.dot{border-radius:50%;background:var(--page-ink)}
 .sky svg{width:100%;height:100%;fill:currentColor;display:block}
 @keyframes twinkle{50%{opacity:.35}}
-main{position:relative;z-index:1}
-.lace{color:var(--ink)}
-main{max-width:440px;margin:0 auto;min-height:100dvh;padding:20px 20px calc(24px + env(safe-area-inset-bottom));display:flex;flex-direction:column}
+.sky i.shoot{width:150px;height:2px;border-radius:2px;background:linear-gradient(90deg,transparent,#fff);rotate:156deg;animation:shoot 1.2s ease-out forwards}
+@keyframes shoot{0%{opacity:0;translate:0 0}15%{opacity:1}100%{opacity:0;translate:-340px 150px}}
+
+main{position:relative;z-index:1;max-width:440px;margin:0 auto;min-height:100dvh;padding:calc(16px + env(safe-area-inset-top)) 20px calc(24px + env(safe-area-inset-bottom));display:flex;flex-direction:column}
 .screen{display:none;flex:1;flex-direction:column;animation:fade .45s ease both}
 .screen.on{display:flex}
 @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 .top{height:40px;display:flex;align-items:center}
-.back{background:none;border:0;color:var(--page-muted);font:inherit;font-size:15px;padding:8px 8px 8px 0;cursor:pointer}
-.back:focus-visible,.btn:focus-visible,.mode:focus-visible,textarea:focus-visible{outline:2px solid var(--rose-deep);outline-offset:3px}
-h1,h2{font-family:var(--serif);font-weight:400;letter-spacing:.01em;text-align:center}
-h1{font-size:68px;line-height:1}
-h2{font-size:34px;margin:8px 0 24px}
-.sub{text-align:center;color:var(--page-muted);font-family:var(--serif);font-style:italic;font-size:20px;margin-top:6px}
-
-/* lace card */
-.lace{position:relative;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:28px 22px;
-  box-shadow:0 1px 0 #fff inset,0 18px 40px -24px rgba(90,60,40,.35)}
-.lace::before{content:"";position:absolute;inset:7px;border:1px solid var(--line);border-radius:9px;pointer-events:none;
-  -webkit-mask:radial-gradient(circle at 0 0,#0000 14px,#000 15px) top left/51% 51% no-repeat,radial-gradient(circle at 100% 0,#0000 14px,#000 15px) top right/51% 51% no-repeat,radial-gradient(circle at 0 100%,#0000 14px,#000 15px) bottom left/51% 51% no-repeat,radial-gradient(circle at 100% 100%,#0000 14px,#000 15px) bottom right/51% 51% no-repeat;
-  mask:radial-gradient(circle at 0 0,#0000 14px,#000 15px) top left/51% 51% no-repeat,radial-gradient(circle at 100% 0,#0000 14px,#000 15px) top right/51% 51% no-repeat,radial-gradient(circle at 0 100%,#0000 14px,#000 15px) bottom left/51% 51% no-repeat,radial-gradient(circle at 100% 100%,#0000 14px,#000 15px) bottom right/51% 51% no-repeat}
-.lace::after{content:"";position:absolute;left:18px;right:18px;top:-6px;height:12px;
-  background:radial-gradient(circle at 6px 6px,var(--card) 4.5px,var(--line) 5px,transparent 5.5px) 0 0/12px 12px repeat-x;pointer-events:none}
-
-.kicker{text-align:center;font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--page-muted);margin-bottom:12px}
-.intro{text-align:center;color:var(--page-muted);font-size:15px;line-height:1.55;max-width:320px;margin:14px auto 0}
-.hero{flex:1;display:flex;flex-direction:column;justify-content:center;gap:34px;padding:10px 0}
-.fan{position:relative;height:220px;display:grid;place-items:center}
-.fan i{position:absolute;width:118px;height:178px;border-radius:10px;border:3px solid var(--card);box-shadow:0 14px 30px -14px #000;
-  background:radial-gradient(#f2d8a7 16%,transparent 17%) 0 0/14px 14px,radial-gradient(#f2d8a7 16%,transparent 17%) 7px 7px/14px 14px,#2d2f5e;display:grid;place-items:center}
-.fan i:nth-child(1){transform:rotate(-14deg) translate(-38px,8px)} .fan i:nth-child(2){transform:rotate(14deg) translate(38px,8px)}
-.fan i:nth-child(3) svg{width:30px;fill:var(--card)}
-
-/* hexagram lines */
-.hex{display:flex;flex-direction:column-reverse;gap:10px;width:120px}
-.ln{height:9px;display:flex;justify-content:space-between}
-.ln i{display:block;height:100%;background:var(--ink);border-radius:2px;flex:1;transition:flex .35s ease,background .35s,opacity .35s}
-.ln i+i{margin-left:0}
-.ln.yin i:first-child{flex:.44} .ln.yin i:last-child{flex:.44}
-.ln.yin{gap:12%}
-.ln.moving i{background:var(--rose-deep)}
-.castname small{display:block;font-family:var(--sans);font-size:13px;letter-spacing:.02em;text-transform:none;color:var(--muted);margin-top:6px;line-height:1.5}
-.ln.wait i{background:var(--line);animation:shimmer 1.2s ease-in-out infinite}
-.ln.wait i:last-child{display:none}
-@keyframes shimmer{50%{opacity:.35}}
-.hero .hex .ln i{background:var(--rose-deep);opacity:.75}
-
-.btn{display:block;width:100%;border:0;border-radius:999px;padding:16px;font:inherit;font-size:17px;font-weight:400;letter-spacing:.06em;
-  color:var(--ink);background:var(--rose);cursor:pointer;transition:transform .15s,box-shadow .15s;box-shadow:0 10px 24px -12px rgba(0,0,0,.6)}
-.btn:active{transform:scale(.98)}
-.btn.sage{background:var(--sage)}
-.btn:disabled{opacity:.5;cursor:default}
+.back{background:none;border:0;color:var(--page-muted);font-size:15px;padding:8px 8px 8px 0;cursor:pointer}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+h1,h2,h3{font-family:var(--serif);font-weight:400;text-align:center;text-wrap:balance}
+h1{font-size:54px;line-height:1.02}
+h2{font-size:34px;line-height:1.1;margin:6px 0 18px}
+.kicker{text-align:center;font-size:12px;font-weight:500;letter-spacing:.32em;text-transform:uppercase;color:var(--gold);margin-bottom:10px}
+.sub{text-align:center;color:var(--page-muted);font:italic 21px/1.3 var(--serif);margin-top:8px}
 .foot{margin-top:auto;padding-top:20px}
 
-/* modes */
-.modes{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-[hidden]{display:none!important}
-.mode{font:inherit;color:var(--ink);cursor:pointer;text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px;padding:26px 14px 22px;transition:transform .15s}
-.mode:active{transform:scale(.98)}
-.mode .zh{font-family:var(--zh);font-size:30px;color:var(--rose-deep)}
-.mode b{font-family:var(--serif);font-weight:400;font-size:24px}
-.mode small{color:var(--muted);font-size:13px;line-height:1.35}
-.mode.wide{grid-column:1/-1}
-.mode[aria-disabled=true]{cursor:default;opacity:.55}
-.tag{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--sage-deep);border:1px solid var(--sage);border-radius:99px;padding:3px 10px}
+/* lace paper: scalloped top and bottom edges with eyelets */
+.lace{--s:12px;position:relative;color:var(--ink);padding:calc(var(--s) + 22px) 22px;
+  background:
+    radial-gradient(circle at 50% 7px,var(--line) 1.7px,transparent 2.3px) 0 0/20px var(--s) round no-repeat,
+    radial-gradient(circle at 50% 5px,var(--line) 1.7px,transparent 2.3px) 0 100%/20px var(--s) round no-repeat,
+    radial-gradient(circle at 50% 100%,var(--card) 9.5px,transparent 10px) 0 0/20px var(--s) round no-repeat,
+    radial-gradient(circle at 50% 0,var(--card) 9.5px,transparent 10px) 0 100%/20px var(--s) round no-repeat,
+    linear-gradient(var(--card),var(--card)) 0 var(--s)/100% calc(100% - 2 * var(--s)) no-repeat;
+  filter:drop-shadow(0 18px 22px rgba(8,8,30,.4))}
+.lace::before{content:"";position:absolute;inset:calc(var(--s) + 7px) 7px;border:1px solid var(--line);border-radius:9px;pointer-events:none;
+  -webkit-mask:radial-gradient(circle at 0 0,#0000 14px,#000 15px) top left/51% 51% no-repeat,radial-gradient(circle at 100% 0,#0000 14px,#000 15px) top right/51% 51% no-repeat,radial-gradient(circle at 0 100%,#0000 14px,#000 15px) bottom left/51% 51% no-repeat,radial-gradient(circle at 100% 100%,#0000 14px,#000 15px) bottom right/51% 51% no-repeat;
+  mask:radial-gradient(circle at 0 0,#0000 14px,#000 15px) top left/51% 51% no-repeat,radial-gradient(circle at 100% 0,#0000 14px,#000 15px) top right/51% 51% no-repeat,radial-gradient(circle at 0 100%,#0000 14px,#000 15px) bottom left/51% 51% no-repeat,radial-gradient(circle at 100% 100%,#0000 14px,#000 15px) bottom right/51% 51% no-repeat}
 
-/* question */
-.qcard{padding:22px}
-.qlabel{display:block;font-family:var(--serif);font-style:italic;font-size:18px;color:var(--muted);margin-bottom:10px}
-textarea{width:100%;min-height:150px;border:0;resize:none;background:transparent;font:inherit;font-size:18px;line-height:1.5;color:var(--ink)}
-textarea::placeholder{color:#aaa3bf}
-.count{text-align:right;font-size:12px;color:var(--muted)}
-.hint{color:var(--page-muted);font-size:14px;line-height:1.5;text-align:center;margin-top:18px;padding:0 10px}
+.btn{display:block;width:100%;border:0;border-radius:999px;padding:16px;font-size:17px;font-weight:500;letter-spacing:.05em;
+  color:var(--ink);background:var(--gold);cursor:pointer;transition:transform .15s;box-shadow:0 10px 24px -12px rgba(0,0,0,.6)}
+.btn:active{transform:scale(.98)}
+.btn:disabled{opacity:.45;cursor:default}
+.btn.ghost{background:transparent;color:var(--page-ink);box-shadow:inset 0 0 0 1.5px rgba(242,216,167,.6)}
 
-/* result */
-.result{text-align:center;display:flex;flex-direction:column;align-items:center;gap:16px;padding:30px 22px 26px}
-.castname{font-family:var(--serif);font-size:15px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);min-height:1.2em}
-.verdict{font-family:var(--serif);font-size:18px;font-style:italic}
-.reading{opacity:0;transition:opacity .6s ease;display:flex;flex-direction:column;gap:14px}
-.reading.on{opacity:1}
-.reading h3{font-family:var(--serif);font-weight:400;font-size:30px;line-height:1.15}
-.reading p{font-size:16.5px;line-height:1.65;text-align:left}
-.step{background:var(--soft);border-radius:10px;padding:12px 14px;font-size:15px;line-height:1.5;text-align:left}
-.step span{display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--rose-deep);margin-bottom:4px}
-.yourq{font-family:var(--serif);font-style:italic;color:var(--muted);font-size:17px;line-height:1.4}
-.err{color:var(--rose-deep)}
-.note{font-size:12px;color:var(--page-muted);text-align:center;margin-top:14px}
-.group{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--page-muted);margin:4px 0 14px;text-align:center}
-.group + .modes, .modes + .group{margin-top:22px}
-.minis{display:flex;height:44px;align-items:flex-end}
-.minis i{width:24px;height:38px;border:2px solid var(--card);border-radius:4px;background:radial-gradient(#f2d8a7 18%,transparent 19%) 0 0/7px 7px,#2d2f5e;margin:0 -4px}
-.minis i:nth-child(odd){transform:rotate(-8deg)} .minis i:nth-child(even){transform:rotate(8deg) translateY(-3px)}
+/* coins */
+.coin{font-size:10px;width:4.4em;height:4.4em;border-radius:50%;position:relative;display:inline-grid;place-items:center;flex:none;
+  background:radial-gradient(circle at 35% 30%,#fff1c9,#e0bb68 50%,#a8822f);box-shadow:inset 0 0 0 .3em rgba(120,80,20,.3),0 .6em 1.2em -.6em #000}
+.coin::before{content:"";width:1.15em;height:1.15em;background:var(--night);box-shadow:0 0 0 .18em rgba(110,75,20,.55)}
+.coin::after{content:"";position:absolute;inset:.6em;border-radius:50%;border:1px solid rgba(107,77,22,.45)}
+.coin.heads::after{content:"通\A\A寶";white-space:pre;border:0;inset:0;display:grid;place-items:center;text-align:center;font:500 1.05em/1.15 var(--zh);color:#6b4d16}
 
-/* tarot spread */
-.spread{display:grid;gap:10px;width:100%}
+/* hexagram lines; colour comes from the container */
+.hex{display:flex;flex-direction:column-reverse;gap:var(--gap,10px);width:var(--w,120px)}
+.ln{height:var(--lh,9px);display:flex;position:relative}
+.ln i{flex:1;background:currentColor;border-radius:2px}
+.ln.yin{gap:16%}
+.ln:not(.yin) i+i{display:none}
+.ln.slot i{background:rgba(242,216,167,.16)}
+.ln.land{animation:land .5s ease both}
+@keyframes land{from{opacity:0;transform:scaleX(.5)}}
+.ln.moving::after{content:"";position:absolute;right:-22px;top:50%;width:12px;height:12px;translate:0 -50%;background:currentColor;
+  -webkit-mask:var(--spark) center/contain no-repeat;mask:var(--spark) center/contain no-repeat}
+
+/* tarot cards */
+.cardback{background:var(--back-bg);border:3px solid var(--card)}
 .tc{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0}
-.tc small{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);text-align:center;line-height:1.3;min-height:2.6em;display:flex;align-items:flex-end}
-.face{width:100%;aspect-ratio:2/3.2;border:1px solid var(--line);border-radius:8px;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:6px;
-  transition:transform .5s ease,background .3s}
-.face b{font-family:var(--serif);font-weight:400;font-size:24px;color:var(--rose-deep);line-height:1}
-.face span{font-family:var(--serif);font-size:13px;line-height:1.15;text-align:center}
-.tc.rev .face{background:var(--soft);border-color:var(--rose-deep)}
+.tc small{font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:inherit;opacity:.8;text-align:center;line-height:1.25;min-height:2.5em;display:flex;align-items:flex-end}
 .tc small:empty{display:none}
-.tc em{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--rose-deep);font-style:normal;min-height:1.2em}
-.tc.back .face{transform:rotateY(180deg);background:radial-gradient(#f2d8a7 16%,transparent 17%) 0 0/12px 12px,radial-gradient(#f2d8a7 16%,transparent 17%) 6px 6px/12px 12px,#2d2f5e;border:3px solid var(--card)}
-.tc.back .face *, .tc.back em{visibility:hidden}
-/* daily ritual: one star per day asked, seven in a row make a constellation */
-.ritual{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;color:var(--page-muted);font-size:14px;line-height:1.45;margin-top:16px}
-.stars{display:flex;gap:9px}
-.stars svg{width:15px;height:15px;fill:rgba(242,216,167,.22);transition:fill .4s}
-.stars svg.lit{fill:#f2d8a7;filter:drop-shadow(0 0 5px rgba(242,216,167,.7))}
-.stars svg.new{animation:pop .9s ease .4s both}
-@keyframes pop{0%{transform:scale(.4);fill:rgba(242,216,167,.22)}60%{transform:scale(1.5)}100%{transform:scale(1)}}
-.prompt{display:block;width:100%;margin-top:14px;background:rgba(244,236,220,.08);border:1px dashed rgba(242,216,167,.45);border-radius:12px;padding:12px 14px;
-  font:inherit;font-size:15px;line-height:1.45;color:var(--page-ink);text-align:left;cursor:pointer}
-.prompt span{display:block;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--rose);margin-bottom:3px}
-.prompt:focus-visible{outline:2px solid var(--rose);outline-offset:3px}
+.face{width:100%;aspect-ratio:2/3.2;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:6px}
+.face b{font:400 24px/1 var(--serif);color:var(--gold-deep)}
+.face span{font:400 13px/1.15 var(--serif);text-align:center}
+.face .zh{font:400 11px var(--zh);color:var(--muted)}
+.tc.rev .face{transform:rotate(180deg);background:var(--soft)}
+.tc em{font-size:10px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);font-style:normal;min-height:1.3em}
+.tc.empty .face{background:none;border:1.5px dashed rgba(242,216,167,.4)}
+.tc.back .face{background:var(--back-bg);border:3px solid var(--card)}
+.tc.flip{animation:flip .5s ease both}
+@keyframes flip{from{transform:rotateY(90deg)}}
+
+/* 1. start */
+.start{flex:1;display:flex;flex-direction:column;justify-content:center;gap:6px}
+.altar{position:relative;height:240px;display:grid;place-items:center;margin:4px 0}
+.doily{position:absolute;inset:0;margin:auto;width:236px;height:236px;animation:turn 240s linear infinite}
+@keyframes turn{to{rotate:360deg}}
+.daycard{position:relative;width:112px;height:176px;border-radius:10px;rotate:-5deg;box-shadow:0 16px 30px -12px #000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--gold-deep)}
+.daycard.faceup{background:var(--card);border:1px solid var(--line)}
+.daycard .hex{--w:58px;--lh:6px;--gap:6px}
+.daycard b{font:400 34px/1 var(--serif)}
+.daycard .zh{font:500 20px var(--zh);color:var(--ink)}
+.altar .coin{position:absolute;font-size:8px}
+.altar .coin:nth-of-type(1){left:calc(50% + 40px);top:63%;rotate:14deg}
+.altar .coin:nth-of-type(2){left:calc(50% + 72px);top:52%;rotate:-22deg}
+.altar .coin:nth-of-type(3){left:calc(50% + 66px);top:74%;rotate:40deg}
+.today{text-align:center;min-height:72px}
+.today .lbl{font-size:11px;font-weight:500;letter-spacing:.24em;text-transform:uppercase;color:var(--gold)}
+.today .nm{font:400 22px/1.3 var(--serif);margin-top:2px}
+.today .nm span{font:400 16px var(--zh);color:var(--page-muted);margin-left:6px}
+.today .ad{color:var(--page-muted);font-size:15px;line-height:1.45;max-width:300px;margin:2px auto 0}
+.about{margin-top:14px;text-align:center;color:var(--page-muted);font-size:14px}
+.about summary{cursor:pointer;list-style:none;text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(211,206,232,.5)}
+.about summary::-webkit-details-marker{display:none}
+.about p{margin-top:8px;line-height:1.55}
+.backs{display:flex;justify-content:center;gap:10px;margin-top:10px}
+.backs button{width:26px;height:40px;border-radius:5px;cursor:pointer;border-width:2px;opacity:.7;padding:0}
+.backs button[aria-pressed=true]{opacity:1;outline:2px solid var(--gold);outline-offset:2px}
+
+/* 2. ask */
+#q{display:block;width:100%;min-height:128px;border:0;border-bottom:1.5px solid rgba(242,216,167,.4);background:transparent;color:var(--page-ink);
+  font:400 26px/1.35 var(--serif);padding:6px 2px 12px;resize:none;transition:border-color .2s}
+#q:focus{outline:none;border-bottom-color:var(--gold)}
+#q::placeholder{color:rgba(246,239,224,.42);font-style:italic}
+.count{text-align:right;font-size:12px;color:var(--page-muted);margin-top:6px}
+.prompt{display:block;width:100%;margin-top:18px;background:rgba(246,239,224,.07);border:1px dashed rgba(242,216,167,.45);border-radius:14px;padding:12px 14px;font-size:16px;line-height:1.45;text-align:left;cursor:pointer}
+.prompt span{display:block;font-size:11px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin-bottom:3px}
+.prompt b{font-weight:400}
+.hint{color:var(--page-muted);font-size:14px;line-height:1.5;text-align:center;margin-top:18px;padding:0 6px}
+
+/* 3. how */
+.echo{text-align:center;font:italic 19px/1.35 var(--serif);color:var(--page-muted);text-wrap:balance;margin:-6px 0 22px}
+.doors{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.door{border:0;cursor:pointer;text-align:center;display:flex;flex-direction:column;align-items:center;gap:8px;padding-top:40px;padding-bottom:36px;transition:transform .15s}
+.door{filter:drop-shadow(0 12px 9px rgba(8,8,30,.35))}
+.door:active{transform:scale(.97)}
+.door .art{height:62px;display:flex;align-items:center;justify-content:center}
+.door .art .coin{font-size:7px;margin:0 -3px}
+.door .art .coin:nth-child(2){translate:0 -8px}
+.minis{display:flex;align-items:flex-end}
+.minis i{width:26px;height:42px;border-radius:4px;border-width:2px;margin:0 -4px}
+.minis i:nth-child(odd){rotate:-9deg} .minis i:nth-child(even){rotate:9deg;translate:0 -4px}
+.door .zh{font:400 22px var(--zh);color:var(--gold-deep)}
+.door b{font:400 28px/1 var(--serif)}
+.door small{color:var(--muted);font-size:14px;line-height:1.35;min-height:2.7em}
+.toggle{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:28px;font-size:17px;cursor:pointer;position:relative}
+.toggle input{position:absolute;opacity:0;width:1px;height:1px}
+.track{width:48px;height:28px;border-radius:99px;background:rgba(246,239,224,.2);position:relative;transition:background .2s;flex:none}
+.track i{position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:var(--page-ink);transition:transform .2s}
+.toggle input:checked+.track{background:var(--gold-deep)}
+.toggle input:checked+.track i{transform:translateX(20px)}
+.toggle input:focus-visible+.track{outline:2px solid var(--gold);outline-offset:3px}
+.toggle-note{text-align:center;color:var(--page-muted);font-size:14px;margin-top:8px;min-height:1.5em}
+
+/* 4. cast rituals */
+.stage{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:30px;padding:8px 0}
+.instr{text-align:center;color:var(--page-muted);font-size:16px;line-height:1.5;min-height:3em;max-width:320px;margin:0 auto}
+.instr b{color:var(--page-ink);font:400 22px var(--serif);display:block}
+.stage .hex{--w:170px;--lh:13px;--gap:13px;color:var(--gold)}
+#d-hex{--w:130px;--lh:9px;--gap:9px}
+.stage .hex .moving{color:#fff;filter:drop-shadow(0 0 6px var(--gold))}
+.toss{background:none;border:0;cursor:pointer;padding:16px 10px;display:flex;gap:16px;border-radius:20px}
+.toss .coin{font-size:15px}
+.coin.spin{animation:toss .75s cubic-bezier(.3,.6,.4,1) both}
+.coin.spin:nth-child(2){animation-delay:.06s}.coin.spin:nth-child(3){animation-delay:.12s}
+.coin.spin.wait{animation:toss .75s linear infinite}
+@keyframes toss{0%{transform:none}45%{transform:translateY(-70px) rotateX(900deg)}100%{transform:rotateX(1800deg)}}
+.dial{position:relative;width:244px;height:244px;flex:none;border-radius:50%;border:0;cursor:pointer;color:var(--ink);padding:0;
+  background:radial-gradient(circle,var(--card) 0 57%,var(--line) 57.5% 58.2%,var(--card) 58.7%);box-shadow:0 0 0 7px rgba(242,216,167,.22),0 0 70px -6px rgba(242,216,167,.45)}
+.dial .ring b{position:absolute;left:50%;top:50%;font:500 15px var(--zh);color:var(--muted);transform:translate(-50%,-50%) rotate(var(--a)) translateY(-101px) rotate(calc(-1 * var(--a)))}
+.dial .ring b.now{color:var(--gold-deep);font-size:18px}
+.hand{position:absolute;left:50%;bottom:50%;transform-origin:50% 100%;border-radius:3px;rotate:var(--r,0deg);translate:-50% 0}
+.hand.h{width:5px;height:56px;background:var(--ink)}
+.hand.s{width:2px;height:80px;background:var(--gold-deep)}
+.dial::after{content:"";position:absolute;left:50%;top:50%;width:12px;height:12px;border-radius:50%;background:var(--gold-deep);translate:-50% -50%}
+.clock{position:absolute;left:50%;top:64%;translate:-50% 0;z-index:1;background:var(--card);border-radius:8px;padding:0 6px;font:400 28px var(--serif);letter-spacing:.06em;font-variant-numeric:tabular-nums}
+.dial.caught{animation:caught 1s ease}
+@keyframes caught{30%{box-shadow:0 0 0 14px rgba(242,216,167,.5),0 0 110px 10px rgba(242,216,167,.7)}}
+.slots{display:grid;grid-template-columns:repeat(var(--n),1fr);gap:10px;width:100%;color:var(--page-ink)}
+.fan{position:relative;width:100%;height:170px}
+.fc{position:absolute;left:50%;bottom:10px;width:64px;height:100px;margin-left:-32px;border-radius:7px;cursor:pointer;padding:0;
+  transform-origin:50% 230%;rotate:calc(var(--i) * 5.5deg);transition:translate .2s,opacity .3s;box-shadow:0 8px 16px -8px #000}
+.fc:hover,.fc:focus-visible{translate:0 -12px}
+.fc.picked{opacity:0;translate:0 -50px;pointer-events:none}
+.err{color:var(--gold);text-align:center;line-height:1.5}
+
+/* 5. result keepsake */
+.keep{text-align:center;display:flex;flex-direction:column;align-items:center;gap:14px;padding-top:44px;padding-bottom:40px}
+.date{font-size:11px;font-weight:500;letter-spacing:.24em;text-transform:uppercase;color:var(--muted)}
+.yourq{font:italic 19px/1.4 var(--serif);color:var(--muted);text-wrap:balance}
+.sign{position:relative;display:grid;place-items:center;width:100%;padding:12px 0;color:var(--gold-deep)}
+.sign .wm{position:absolute;inset:0;display:grid;place-items:center;font:500 150px/1 var(--zh);opacity:.1;pointer-events:none}
+.sign .wm.two{font-size:96px}
+.sign .hex{--w:150px;--lh:12px;--gap:12px}
+.sign .hex .moving{color:var(--ink)}
+.sign .slots{color:var(--muted)}
+.sign .tc em{color:var(--gold-deep)}
+.signname{font:400 16px var(--serif);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.signname span{font-family:var(--zh);letter-spacing:0;margin-left:6px}
+.keep h3{font:italic 400 34px/1.12 var(--serif);margin-top:4px}
+.keep .body{font-size:17px;line-height:1.6;text-align:left}
+.step{width:100%;background:var(--soft);border:1px dashed var(--gold-deep);border-radius:16px;padding:12px 16px;text-align:left;font-size:16px;line-height:1.5}
+.step span{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--gold-deep);margin-bottom:3px}
+.step span::before{content:"";width:11px;height:11px;background:currentColor;-webkit-mask:var(--spark) center/contain no-repeat;mask:var(--spark) center/contain no-repeat}
+.how{width:100%;font-size:14px;color:var(--muted);text-align:left}
+.how summary{cursor:pointer;text-align:center;font-size:13px;letter-spacing:.06em}
+.how p{margin-top:8px;line-height:1.55}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:22px}
+.ritual{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;color:var(--page-muted);font-size:14px;line-height:1.45;margin-top:18px}
+.stars{display:flex;gap:6px}
+.star{width:26px;height:26px;display:grid;place-items:center;background:none;border:0;padding:0}
+button.star{cursor:pointer}
+.star svg{width:15px;height:15px;fill:rgba(242,216,167,.22);transition:fill .4s,transform .2s}
+.star.lit svg{fill:var(--gold);filter:drop-shadow(0 0 5px rgba(242,216,167,.7))}
+button.star:hover svg{transform:scale(1.25)}
+.star.new svg{animation:pop .9s ease .4s both}
+@keyframes pop{0%{transform:scale(.4);fill:rgba(242,216,167,.22)}60%{transform:scale(1.6)}100%{transform:scale(1)}}
+.reward{color:var(--gold)}
+.a2hs{display:flex;align-items:center;gap:10px;margin-top:18px;padding:12px 14px;border-radius:14px;background:rgba(246,239,224,.08);font-size:14px;line-height:1.45}
+.a2hs p{flex:1}
+.a2hs .btn{width:auto;padding:9px 14px;font-size:14px}
+.a2hs .x{background:none;border:0;color:var(--page-muted);font-size:22px;line-height:1;cursor:pointer;padding:4px}
+.note{font-size:12px;color:var(--page-muted);text-align:center;margin-top:16px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
-<div class="sky" aria-hidden="true"></div>
+<div class="sky" aria-hidden="true"><div class="layer"></div><div class="layer"></div><div class="layer"></div></div>
 <main>
   <!-- 1. start -->
   <section class="screen on" id="s-start" aria-labelledby="t-start">
-    <div class="hero">
-      <div>
-        <p class="kicker">Find your answer</p>
-        <h1 id="t-start">Oracle</h1>
+    <div class="start">
+      <header>
+        <p class="kicker">Oracle</p>
+        <h1 id="t-start">Find your answer</h1>
         <p class="sub">Find your quiet sign</p>
-        <p class="intro">Discover soft, AI‑powered guidance from Liu‑Yao — ancient Chinese I‑Ching divination — and Tarot. When you feel unsure amid choices, get a small nudge to move forward.</p>
+      </header>
+      <div class="altar" aria-hidden="true">
+        <div class="doily"></div>
+        <div class="daycard cardback" id="daycard"></div>
+        <i class="coin heads"></i><i class="coin"></i><i class="coin heads"></i>
       </div>
-      <div class="fan" aria-hidden="true"><i></i><i></i><i><svg viewBox="0 0 20 20"><path d="M10 0C11 7 13 9 20 10 13 11 11 13 10 20 9 13 7 11 0 10 7 9 9 7 10 0Z"/></svg></i></div>
+      <div class="today" id="today" aria-live="polite"></div>
       <div class="ritual" id="ritual-start"></div>
+      <div class="backs" id="backs" hidden></div>
     </div>
-    <div class="foot"><button class="btn sage" data-go="mode">Start</button></div>
-  </section>
-
-  <!-- 2. mode -->
-  <section class="screen" id="s-mode" aria-labelledby="t-mode">
-    <div class="top"><button class="back" data-go="start">&larr; Back</button></div>
-    <h2 id="t-mode">Choose a mode</h2>
-    <p class="group">I Ching</p>
-    <div class="modes">
-      <button class="mode lace" data-mode="yesno">
-        <span class="zh" aria-hidden="true">小六爻</span><b>Yes / No</b><small>A quick, clear answer when you're stuck</small>
-      </button>
-      <button class="mode lace" data-mode="guidance">
-        <span class="zh" aria-hidden="true">六爻</span><b>Guidance</b><small>Short advice from your hexagram</small>
-      </button>
-    </div>
-    <p class="group">Tarot</p>
-    <div class="modes">
-      <button class="mode lace" data-mode="tarot-yesno">
-        <span class="minis" aria-hidden="true"><i></i><i></i><i></i></span><b>Yes / No</b><small>Three cards, counted upright or reversed</small>
-      </button>
-      <button class="mode lace" data-mode="tarot-guidance">
-        <span class="minis" aria-hidden="true"><i></i><i></i><i></i><i></i></span><b>Guidance</b><small>Four cards, straight to the core</small>
-      </button>
+    <div class="foot">
+      <button class="btn" data-go="ask">Ask the oracle</button>
+      <details class="about"><summary>What is this?</summary>
+        <p>Discover soft, AI-powered guidance from Liu-Yao, ancient Chinese I Ching divination, and Tarot. When you feel unsure amid choices, get a small nudge to move forward.</p>
+      </details>
     </div>
   </section>
 
-  <!-- 3. question -->
+  <!-- 2. question first -->
   <section class="screen" id="s-ask" aria-labelledby="t-ask">
-    <div class="top"><button class="back" data-go="mode">&larr; Back</button></div>
-    <h2 id="t-ask">Your question</h2>
-    <form id="ask" class="lace qcard">
-      <label class="qlabel" for="q" id="qlabel">Ask it the way you'd ask a friend</label>
-      <textarea id="q" maxlength="300" required placeholder="Should I text them first?"></textarea>
+    <div class="top"><button class="back" data-go="start">&larr; Home</button></div>
+    <h2 id="t-ask">What&rsquo;s on your mind?</h2>
+    <form id="ask">
+      <label class="sr" for="q">Your question</label>
+      <textarea id="q" maxlength="300" rows="3" placeholder="Ask it the way you&rsquo;d ask a friend"></textarea>
       <div class="count"><span id="n">0</span>/300</div>
     </form>
     <button type="button" class="prompt" id="prompt"><span>Today&rsquo;s prompt</span><b id="prompt-q"></b></button>
-    <p class="hint" id="hint">Questions for genuine reflection are recommended. Playful or nonsensical prompts may yield meaningless readings.</p>
-    <div class="foot"><button class="btn" form="ask" type="submit">Send</button></div>
+    <p class="hint">Questions for genuine reflection are recommended. Playful or nonsensical prompts may yield meaningless readings.</p>
+    <div class="foot"><button class="btn" form="ask" type="submit" id="next" disabled>Continue</button></div>
   </section>
 
-  <!-- 4. result -->
-  <section class="screen" id="s-result" aria-labelledby="t-result">
+  <!-- 3. then how to read it -->
+  <section class="screen" id="s-how" aria-labelledby="t-how">
     <div class="top"><button class="back" data-go="ask">&larr; Back</button></div>
-    <h2 id="t-result">Your result</h2>
-    <div class="lace result" aria-live="polite">
-      <p class="yourq" id="r-q"></p>
-      <div class="hex" id="r-hex" hidden></div>
-      <div class="spread" id="r-cards" hidden></div>
-      <p class="castname" id="r-name">Casting&hellip;</p>
-      <div class="reading" id="r-reading"></div>
+    <h2 id="t-how">How should we read it?</h2>
+    <p class="echo" id="echo"></p>
+    <div class="doors">
+      <button class="door lace" data-way="iching">
+        <span class="art" aria-hidden="true"><i class="coin heads"></i><i class="coin"></i><i class="coin heads"></i></span>
+        <span class="zh" id="zh-iching" aria-hidden="true">六爻</span><b>I Ching</b><small id="sub-iching"></small>
+      </button>
+      <button class="door lace" data-way="tarot">
+        <span class="art minis" aria-hidden="true"><i class="cardback"></i><i class="cardback"></i><i class="cardback"></i></span>
+        <span class="zh" aria-hidden="true">塔罗</span><b>Tarot</b><small id="sub-tarot"></small>
+      </button>
     </div>
+    <label class="toggle"><input type="checkbox" id="yn" role="switch"><span class="track" aria-hidden="true"><i></i></span><span>Just a yes or no?</span></label>
+    <p class="toggle-note" id="yn-note"></p>
+  </section>
+
+  <!-- 4. the cast -->
+  <section class="screen" id="s-cast" aria-labelledby="t-cast">
+    <div class="top"><button class="back" id="cast-back">&larr; Back</button></div>
+    <h2 id="t-cast"></h2>
+    <p class="echo" id="cast-q"></p>
+    <div class="stage" id="stage"></div>
+    <p class="instr" id="instr" aria-live="polite"></p>
+  </section>
+
+  <!-- 5. the keepsake -->
+  <section class="screen" id="s-result" aria-labelledby="r-title">
+    <div class="top"><button class="back" data-go="start">&larr; Home</button></div>
+    <article class="lace keep" aria-live="polite">
+      <p class="date" id="r-date"></p>
+      <p class="yourq" id="r-q"></p>
+      <div class="sign" id="r-sign"></div>
+      <p class="signname" id="r-name"></p>
+      <h3 id="r-title"></h3>
+      <p class="body" id="r-body"></p>
+      <div class="step" id="r-step"><span>Small step</span><p></p></div>
+      <details class="how"><summary>How this was cast</summary><p id="r-how"></p></details>
+    </article>
+    <div class="actions"><button class="btn ghost" id="save">Save image</button><button class="btn" data-go="ask">Ask another</button></div>
     <div class="ritual" id="ritual-result" aria-live="polite"></div>
-    <div class="foot"><button class="btn" data-go="mode" id="again">Again</button></div>
+    <div class="a2hs" id="a2hs" hidden></div>
     <p class="note">For reflection and fun. You already know more than you think.</p>
   </section>
 </main>
 
 <script>
 const $ = (s) => document.querySelector(s);
-const state = { mode: 'guidance' };
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+const load = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } };
+const save = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
+const SPARK = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 0C11 7 13 9 20 10 13 11 11 13 10 20 9 13 7 11 0 10 7 9 9 7 10 0Z"/></svg>';
+const BRANCHES = '子丑寅卯辰巳午未申酉戌亥';
+const BACKS = [{ id: 'dots', name: 'Gold Polka' }, { id: 'stars', name: 'Starfield' }, { id: 'lace', name: 'Rose Lace' }, { id: 'moon', name: 'Moon Phase' }];
+const POSITIONS = { 'tarot-yesno': ['', '', ''], 'tarot-guidance': ['The core', 'The obstacle', 'What to do', 'Your strength'] };
+const state = { question: '', way: 'iching', yn: false, run: null };
 
 function go(name) {
   document.querySelectorAll('.screen').forEach((s) => s.classList.toggle('on', s.id === 's-' + name));
   window.scrollTo(0, 0);
   if (name === 'ask') setTimeout(() => $('#q').focus(), 50);
+  if (name === 'start') { renderRitual($('#ritual-start')); renderBacks(); }
 }
 document.addEventListener('click', (e) => {
-  const g = e.target.closest('[data-go]'); if (g) go(g.dataset.go);
-  const m = e.target.closest('[data-mode]');
-  if (m) {
-    state.mode = m.dataset.mode;
-    const yn = state.mode.endsWith('yesno');
-    $('#qlabel').textContent = yn ? 'Ask something with a yes or no answer' : "Ask it the way you'd ask a friend";
-    $('#q').placeholder = yn ? 'Will they reach out this week?' : 'What should I focus on with my career right now?';
-    $('#prompt-q').textContent = todays(yn ? PROMPTS.yesno : PROMPTS.guidance);
-    go('ask');
-  }
+  const g = e.target.closest('[data-go]'); if (g) { state.run = null; go(g.dataset.go); }
+  const d = e.target.closest('.door'); if (d) { state.way = d.dataset.way; cast(); }
+  const s = e.target.closest('button.star'); if (s) openDay(s.dataset.day);
 });
 
-function drawHex(el, lines, wait) {
-  el.innerHTML = lines.map((l) => `<div class="ln ${wait ? 'wait' : l ? 'yang' : 'yin'}"><i></i><i></i></div>`).join('');
-}
-// starry sky: fixed layer of sparkles and dots, same layout every load
+// ---- sky ----
 (() => {
   let seed = 7; const r = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
-  const spark = '<svg viewBox="0 0 20 20"><path d="M10 0C11 7 13 9 20 10 13 11 11 13 10 20 9 13 7 11 0 10 7 9 9 7 10 0Z"/></svg>';
-  $('.sky').innerHTML = Array.from({ length: 46 }, () => {
-    const big = r() < .22, size = big ? [7, 9, 12, 15][Math.floor(r() * 4)] : 2 + r() * 1.5;
-    const pos = `left:${(r() * 98).toFixed(1)}%;top:${(r() * 98).toFixed(1)}%;width:${size}px;height:${size}px;animation-delay:${(r() * 3).toFixed(1)}s`;
-    return big ? `<i style="${pos}">${spark}</i>` : `<i class="dot" style="${pos};opacity:${(.4 + r() * .5).toFixed(2)}"></i>`;
-  }).join('');
+  document.querySelectorAll('.layer').forEach((layer, li) => {
+    layer.innerHTML = Array.from({ length: [26, 18, 10][li] }, () => {
+      const big = r() < [.12, .25, .5][li], size = big ? [7, 9, 12, 15][Math.floor(r() * 4)] : 1.5 + r() * 1.5 + li * .4;
+      const pos = `left:${(r() * 100).toFixed(1)}%;top:${(r() * 100).toFixed(1)}%;width:${size}px;height:${size}px;animation-delay:${(r() * 3).toFixed(1)}s`;
+      return big ? `<i style="${pos}">${SPARK}</i>` : `<i class="dot" style="${pos};opacity:${(.35 + r() * .5).toFixed(2)}"></i>`;
+    }).join('');
+  });
+  // the doily under today's sign
+  const ring = (n, rad, r2) => Array.from({ length: n }, (_, i) => { const a = (i / n) * 2 * Math.PI; return `<circle cx="${(100 + rad * Math.cos(a)).toFixed(1)}" cy="${(100 + rad * Math.sin(a)).toFixed(1)}" r="${r2}"/>`; }).join('');
+  $('.doily').innerHTML = `<svg viewBox="0 0 200 200"><g fill="#f6efe0" opacity=".13">${ring(30, 86, 11)}<circle cx="100" cy="100" r="86"/></g>
+    <g fill="#1d2347" opacity=".5">${ring(30, 88, 2.4)}${ring(20, 64, 2)}</g>
+    <g fill="none" stroke="#f2d8a7" opacity=".4"><circle cx="100" cy="100" r="74" stroke-dasharray="1.5 4"/><circle cx="100" cy="100" r="54"/></g></svg>`;
 })();
+function shoot() {
+  if (reduced) return;
+  const s = document.createElement('i'); s.className = 'shoot';
+  s.style.cssText = `left:${60 + Math.random() * 30}%;top:${5 + Math.random() * 20}%`;
+  document.querySelector('.layer').append(s); setTimeout(() => s.remove(), 1300);
+}
 
-// ---- daily ritual (per-browser, localStorage) ----
-const SPARK = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 0C11 7 13 9 20 10 13 11 11 13 10 20 9 13 7 11 0 10 7 9 9 7 10 0Z"/></svg>';
+// ---- daily ritual: one star per day asked, seven in a row make a constellation ----
 const dayKey = (d = new Date()) => d.toLocaleDateString('en-CA'); // local YYYY-MM-DD
 const todays = (list) => list[Math.floor(new Date(dayKey()).getTime() / 864e5) % list.length];
-const PROMPTS = {
-  guidance: ['What am I ready to let go of?', 'Where should my energy go this week?', 'What is this relationship trying to teach me?',
-    'What am I avoiding that needs my attention?', 'How can I take better care of myself right now?', 'What would help me feel settled about my work?',
-    'What is the next step on the thing I keep putting off?'],
-  yesno: ['Is now a good time to start the project I keep thinking about?', 'Should I reach out to them this week?', 'Is this opportunity worth a yes?',
-    'Should I rest this weekend instead of making plans?', 'Is this the right time to ask for what I want at work?', 'Should I trust my first instinct on this?',
-    'Is it time to let this go?'],
-};
-function loadDays() { try { return JSON.parse(localStorage.getItem('oracle.days')) || []; } catch { return []; } }
+const PROMPTS = ['What am I ready to let go of?', 'Should I reach out to them this week?', 'Where should my energy go this week?', 'Is this opportunity worth a yes?',
+  'What is this relationship trying to teach me?', 'Should I rest this weekend instead of making plans?', 'What am I avoiding that needs my attention?',
+  'Is this the right time to ask for what I want at work?', 'How can I take better care of myself right now?', 'Should I trust my first instinct on this?',
+  'What would help me feel settled about my work?', 'Is it time to let this go?', 'What is the next step on the thing I keep putting off?', 'Is now a good time to start the project I keep thinking about?'];
 function sky() {
-  const days = new Set(loadDays()), d = new Date(), today = days.has(dayKey(d));
+  const days = new Set(load('oracle.days', [])), d = new Date(), today = days.has(dayKey(d));
   if (!today) d.setDate(d.getDate() - 1);
   let streak = 0;
   while (days.has(dayKey(d))) { streak++; d.setDate(d.getDate() - 1); }
   return { today, streak, lit: today ? ((streak - 1) % 7) + 1 : streak % 7 };
 }
-function renderRitual(el, fresh) {
-  const { today, streak, lit } = sky();
-  const msg = today
-    ? lit === 7 ? 'Seven days in a row. Your constellation is complete, a new sky starts tomorrow.'
-      : fresh ? `Star ${lit} of 7 lit. Come back tomorrow to light the next one.`
-      : `Today's star is lit. Come back tomorrow for star ${lit + 1}.`
-    : streak ? (lit ? `${streak}-day streak. Ask today to light star ${lit + 1}.` : 'Constellation complete. Ask today to start a new one.')
-    : 'Ask once a day to light a star. Seven in a row make a constellation.';
-  el.innerHTML = `<div class="stars">${Array.from({ length: 7 }, (_, i) => SPARK.replace('<svg', `<svg class="${i < lit ? 'lit' : ''}${fresh && i === lit - 1 ? ' new' : ''}"`)).join('')}</div><p>${msg}</p>`;
-}
 function recordToday() {
-  const days = loadDays(), k = dayKey();
+  const days = load('oracle.days', []), k = dayKey();
   if (days.includes(k)) return false;
-  try { localStorage.setItem('oracle.days', JSON.stringify([...days, k].slice(-60))); return true; } catch { return false; }
+  save('oracle.days', [...days, k].slice(-60)); return true;
 }
-renderRitual($('#ritual-start'));
-$('#prompt-q').textContent = todays(PROMPTS.guidance);
-$('#prompt').addEventListener('click', () => { const q = $('#q'); q.value = $('#prompt-q').textContent; $('#n').textContent = q.value.length; q.focus(); });
+const signName = (e) => (e.mode.startsWith('tarot') ? e.cast.cards[0].name : e.cast.name);
+function completeConstellation() {
+  const week = Array.from({ length: 7 }, (_, i) => { const d = new Date(); d.setDate(d.getDate() - i); return dayKey(d); });
+  const tally = {};
+  for (const e of load('oracle.readings', []).filter((e) => week.includes(e.day))) tally[signName(e)] = (tally[signName(e)] || 0) + 1;
+  const name = Object.entries(tally).sort((a, b) => b[1] - a[1])[0]?.[0] || 'Your Week';
+  const list = [...load('oracle.constellations', []), { name, day: dayKey() }];
+  save('oracle.constellations', list);
+  const unlocked = BACKS[list.length];
+  if (unlocked) { save('oracle.back', unlocked.id); applyBack(); }
+  return `Seven days in a row. You made the constellation of ${name}, the sign that came most this week. ` +
+    (unlocked ? `New card back unlocked: ${unlocked.name}.` : 'Every card back is yours now.');
+}
+function renderRitual(el, fresh, reward) {
+  const { today, streak, lit } = sky();
+  const end = new Date(); if (!today) end.setDate(end.getDate() - 1);
+  const saved = new Set(load('oracle.readings', []).map((e) => e.day));
+  let tappable = 0;
+  const stars = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(end); d.setDate(end.getDate() - (lit - 1 - i));
+    const cls = `star${i < lit ? ' lit' : ''}${fresh && i === lit - 1 ? ' new' : ''}`;
+    if (i < lit && saved.has(dayKey(d))) {
+      tappable++;
+      return `<button class="${cls}" data-day="${dayKey(d)}" aria-label="Reopen your reading from ${d.toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}">${SPARK}</button>`;
+    }
+    return `<span class="${cls}">${SPARK}</span>`;
+  }).join('');
+  const last = load('oracle.constellations', []).at(-1);
+  const msg = reward ? `<span class="reward">${esc(reward)}</span>`
+    : today
+      ? lit === 7 ? `Your constellation${last ? ' of ' + esc(last.name) : ''} is complete. A new sky starts tomorrow.`
+        : fresh ? `Star ${lit} of 7 lit. Come back tomorrow to light the next one.`
+        : `Today&rsquo;s star is lit. Come back tomorrow for star ${lit + 1}.`
+      : streak ? (lit ? `${streak}-day streak. Ask today to light star ${lit + 1}.` : 'Constellation complete. Ask today to start a new one.')
+      : 'Ask once a day to light a star. Seven in a row make a constellation.';
+  el.innerHTML = `<div class="stars">${stars}</div><p>${msg}${tappable && !fresh && !reward ? ' Tap a star to reopen that day.' : ''}</p>`;
+}
+function applyBack() { document.body.dataset.back = load('oracle.back', 'dots'); }
+function renderBacks() {
+  const n = Math.min(BACKS.length, 1 + load('oracle.constellations', []).length), el = $('#backs'), cur = load('oracle.back', 'dots');
+  el.hidden = n < 2;
+  el.innerHTML = BACKS.slice(0, n).map((b) => `<button class="cardback bk-${b.id}" data-back="${b.id}" aria-pressed="${b.id === cur}" aria-label="${b.name} card back"></button>`).join('');
+}
+$('#backs').addEventListener('click', (e) => { const b = e.target.closest('[data-back]'); if (b) { save('oracle.back', b.dataset.back); applyBack(); renderBacks(); } });
 
-$('#q').addEventListener('input', (e) => ($('#n').textContent = e.target.value.length));
+// ---- free daily sign (same for everyone, no AI call) ----
+const hexHTML = (lines, moving) => `<div class="hex">${lines.map((l, i) => `<div class="ln ${l ? 'yang' : 'yin'}${i === moving - 1 ? ' moving' : ''}"><i></i><i></i></div>`).join('')}</div>`;
+async function loadToday() {
+  let s = load('oracle.sign', null);
+  if (s?.day !== dayKey()) {
+    try { s = await (await fetch('/api/daily?d=' + dayKey())).json(); save('oracle.sign', s); } catch { return; }
+  }
+  const dc = $('#daycard');
+  dc.className = 'daycard faceup';
+  dc.innerHTML = s.kind === 'hex' ? `${hexHTML(s.lines)}<span class="zh">${esc(s.zh)}</span>` : `<b>${esc(s.glyph)}</b><span class="zh">${esc(s.zh)}</span>`;
+  const line = s.kind === 'hex' ? s.advice : s.up.charAt(0).toUpperCase() + s.up.slice(1) + '.';
+  $('#today').innerHTML = `<p class="lbl">Today&rsquo;s sign</p><p class="nm">${s.kind === 'hex' ? s.n + ' · ' : ''}${esc(s.name)}<span>${esc(s.zh)}</span></p><p class="ad">${esc(line)}</p>`;
+}
+
+// ---- ask, then choose how ----
+const YN = /^(should|will|is|are|am|do|does|did|can|could|would|was|were|has|have|shall|may|must)\b/i;
+$('#prompt-q').textContent = todays(PROMPTS);
+$('#prompt').addEventListener('click', () => { const q = $('#q'); q.value = $('#prompt-q').textContent; q.dispatchEvent(new Event('input')); q.focus(); });
+$('#q').addEventListener('input', (e) => { $('#n').textContent = e.target.value.length; $('#next').disabled = !e.target.value.trim(); });
 $('#q').addEventListener('keydown', (e) => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) $('#ask').requestSubmit(); });
-
-$('#ask').addEventListener('submit', async (e) => {
+$('#ask').addEventListener('submit', (e) => {
   e.preventDefault();
-  const question = $('#q').value.trim();
-  if (!question) return;
-  const yesno = state.mode === 'yesno', tarot = state.mode.startsWith('tarot');
-  const hex = $('#r-hex'), cards = $('#r-cards'), reading = $('#r-reading');
-  $('#r-q').textContent = '“' + question + '”';
-  $('#r-name').textContent = tarot ? 'Shuffling…' : 'Casting…';
-  reading.className = 'reading'; reading.innerHTML = ''; $('#ritual-result').innerHTML = '';
-  hex.hidden = tarot; cards.hidden = !tarot;
-  if (!tarot) drawHex(hex, Array(6).fill(0), true);
-  if (tarot) {
-    const n = state.mode === 'tarot-yesno' ? 3 : 4;
-    cards.style.gridTemplateColumns = `repeat(${n}, 1fr)`;
-    cards.innerHTML = Array(n).fill('<div class="tc back"><small></small><div class="face"><b></b><span></span></div><em></em></div>').join('');
-  }
-  go('result');
+  state.question = $('#q').value.trim();
+  if (!state.question) return;
+  state.yn = YN.test(state.question); // guess from the wording; the toggle can change it
+  $('#yn').checked = state.yn; $('#echo').textContent = `“${state.question}”`;
+  doors(); go('how');
+});
+$('#yn').addEventListener('change', (e) => { state.yn = e.target.checked; doors(); });
+function doors() {
+  $('#zh-iching').textContent = state.yn ? '小六爻' : '六爻';
+  $('#sub-iching').textContent = state.yn ? 'Catch the exact second' : 'Toss three coins, six times';
+  $('#sub-tarot').textContent = state.yn ? 'Three cards, counted upright' : 'Four cards, straight to the core';
+  $('#yn-note').textContent = state.yn ? 'Sounds like a yes or no question.' : '';
+}
+const modeOf = () => (state.way === 'tarot' ? 'tarot-' : '') + (state.yn ? 'yesno' : 'guidance');
+function ask(mode, extra = {}) {
+  return fetch('/api/read', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ mode, question: state.question, timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone, ...extra }),
+  }).then(async (res) => {
+    const d = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(d.error || 'The oracle is quiet right now. Try again in a moment.');
+    return d;
+  });
+}
 
+// ---- the cast: a ritual per mode ----
+const once = (el) => new Promise((r) => el.addEventListener('click', r, { once: true }));
+$('#cast-back').addEventListener('click', () => { state.run = null; go('how'); });
+function cast() {
+  const mode = modeOf(), run = (state.run = {});
+  $('#t-cast').textContent = { yesno: 'Catch the moment', guidance: 'Toss the coins', 'tarot-yesno': 'Pick three cards', 'tarot-guidance': 'Pick four cards' }[mode];
+  $('#cast-q').textContent = `“${state.question}”`;
+  $('#instr').innerHTML = '';
+  go('cast');
+  const ritual = mode === 'yesno' ? dial : mode === 'guidance' ? coins : fan;
+  ritual(run, mode).catch((err) => {
+    if (run !== state.run) return;
+    $('#stage').innerHTML = `<p class="err">${esc(err.message)}</p><button class="btn" style="width:auto;padding:12px 26px" id="retry">Try again</button>`;
+    $('#instr').textContent = '';
+    $('#retry').onclick = cast;
+  });
+}
+// guidance I Ching: the user tosses three coins six times, the lines stack up bottom first
+async function coins(run, mode) {
+  const pending = ask(mode); pending.catch(() => {});
+  $('#stage').innerHTML = `<div class="hex">${'<div class="ln slot"><i></i><i></i></div>'.repeat(6)}</div>
+    <button class="toss" id="toss" aria-label="Toss the coins">${'<i class="coin heads"></i>'.repeat(3)}</button>`;
+  const rows = document.querySelectorAll('#stage .ln'), btn = $('#toss'), cs = btn.querySelectorAll('.coin');
   let data;
-  try {
-    const [res] = await Promise.all([
-      fetch('/api/read', { method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ mode: state.mode, question, timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone }) }),
-      sleep(reduced ? 0 : 1400),
-    ]);
-    data = await res.json();
-    if (!res.ok) throw new Error(data.error);
-  } catch (err) {
-    hex.hidden = cards.hidden = true;
-    $('#r-name').textContent = '';
-    reading.innerHTML = `<p class="err">${esc(err.message || 'The oracle is quiet right now. Try again in a moment.')}</p>`;
-    reading.className = 'reading on';
-    return;
+  for (let i = 0; i < 6; i++) {
+    $('#instr').innerHTML = i ? `Line ${i + 1} of 6. Tap again.` : 'Hold your question in mind, then tap the coins.<br>Six tosses, one line each.';
+    await once(btn);
+    if (run !== state.run) return;
+    btn.disabled = true;
+    cs.forEach((c) => c.classList.add('spin'));
+    const slow = setTimeout(() => cs.forEach((c) => c.classList.add('wait')), 760); // still waiting on the reading
+    [data] = await Promise.all([pending, sleep(reduced ? 0 : 780)]).finally(() => clearTimeout(slow));
+    if (run !== state.run) return;
+    cs.forEach((c, k) => { c.classList.remove('spin', 'wait'); c.classList.toggle('heads', !!data.cast.tosses[i][k]); });
+    rows[i].className = `ln ${data.cast.lines[i] ? 'yang' : 'yin'} land`;
+    btn.disabled = false;
   }
+  btn.disabled = true;
+  $('#instr').innerHTML = `<b>${data.cast.n} · ${esc(data.cast.name)} ${esc(data.cast.zh)}</b>Your hexagram is here.`;
+  shoot(); await sleep(reduced ? 300 : 1400);
+  if (run === state.run) finish(data, mode);
+}
+// Quick Liu Yao: a live clock; the second the user taps is the cast
+async function dial(run, mode) {
+  $('#stage').innerHTML = `<button class="dial" id="dial" aria-label="Catch this second">
+      <span class="ring" aria-hidden="true">${[...BRANCHES].map((b, k) => `<b style="--a:${k * 30}deg">${b}</b>`).join('')}</span>
+      <i class="hand h"></i><i class="hand s"></i><span class="clock" id="clock"></span></button>
+    <div class="hex" id="d-hex" hidden></div>`;
+  $('#instr').innerHTML = 'Tap the dial when the moment feels right.<br>The exact second you choose casts your hexagram.';
+  const el = $('#dial'), branches = el.querySelectorAll('.ring b');
+  const tick = (t = new Date()) => {
+    const h = t.getHours(), m = t.getMinutes(), s = t.getSeconds();
+    $('#clock').textContent = [h, m, s].map((n) => String(n).padStart(2, '0')).join(':');
+    el.querySelector('.h').style.setProperty('--r', `${((h + m / 60) / 24) * 360}deg`);
+    el.querySelector('.s').style.setProperty('--r', `${s * 6}deg`);
+    branches.forEach((b, k) => b.classList.toggle('now', k === Math.floor((h + 1) / 2) % 12));
+  };
+  tick(); const iv = setInterval(tick, 200);
+  await once(el);
+  const at = Date.now(); clearInterval(iv); tick(new Date(at));
+  el.classList.add('caught'); el.disabled = true; shoot();
+  $('#instr').innerHTML = `<b>${$('#clock').textContent}</b>Reading this moment&hellip;`;
+  const data = await ask(mode, { at });
+  if (run !== state.run) return;
+  const c = data.cast, hx = $('#d-hex');
+  hx.hidden = false; hx.innerHTML = '<div class="ln slot"><i></i><i></i></div>'.repeat(6);
+  $('#instr').innerHTML = `<b>${esc(c.time)}</b>`;
+  for (let i = 0; i < 6; i++) { hx.children[i].className = `ln ${c.lines[i] ? 'yang' : 'yin'} land${i === c.moving - 1 ? ' moving' : ''}`; await sleep(reduced ? 0 : 160); }
+  $('#instr').innerHTML = `<b>${c.n} · ${esc(c.name)} ${esc(c.zh)}</b>Line ${c.moving} moves, turning toward ${esc(c.changed.name)}.`;
+  await sleep(reduced ? 300 : 1800);
+  if (run === state.run) finish(data, mode);
+}
+// tarot: the deck fans out, the user picks, the cards turn over one by one
+const cardHTML = (c, label = '') => `<div class="tc${c.reversed ? ' rev' : ''}"><small>${esc(label)}</small><div class="face"><b>${esc(c.glyph)}</b><span>${esc(c.name)}</span><span class="zh">${esc(c.zh)}</span></div><em>${c.reversed ? 'Reversed' : ''}</em></div>`;
+async function fan(run, mode) {
+  const pending = ask(mode); pending.catch(() => {});
+  const labels = POSITIONS[mode], n = labels.length;
+  $('#stage').innerHTML = `<div class="slots" style="--n:${n}">${labels.map((l) => `<div class="tc empty"><small>${l}</small><div class="face"></div><em></em></div>`).join('')}</div>
+    <div class="fan" id="fan">${Array.from({ length: 15 }, (_, i) => `<button class="fc cardback" style="--i:${i - 7}" aria-label="Card ${i + 1}"></button>`).join('')}</div>`;
+  const slots = [...document.querySelectorAll('#stage .tc')], deck = $('#fan');
+  for (let i = 0; i < n; i++) {
+    $('#instr').textContent = i ? `${n - i} more` : `Hold your question in mind, then pick ${n} cards.`;
+    const card = await new Promise((r) => deck.addEventListener('click', function h(e) {
+      const b = e.target.closest('.fc'); if (!b || b.disabled) return; deck.removeEventListener('click', h); r(b);
+    }));
+    if (run !== state.run) return;
+    card.classList.add('picked'); card.disabled = true;
+    slots[i].className = 'tc back';
+  }
+  deck.querySelectorAll('.fc').forEach((b) => (b.disabled = true));
+  $('#instr').textContent = 'Turning them over…';
+  const data = await pending;
+  if (run !== state.run) return;
+  for (const [i, c] of data.cast.cards.entries()) {
+    slots[i].outerHTML = cardHTML(c, labels[i]).replace('class="tc', 'class="tc flip');
+    await sleep(reduced ? 0 : 420);
+  }
+  shoot();
+  $('#instr').innerHTML = data.cast.verdict ? `<b>${esc(data.cast.verdict)}</b>` : '';
+  await sleep(reduced ? 300 : 1600);
+  if (run === state.run) finish(data, mode);
+}
 
-  const { cast, reading: r } = data;
-  if (tarot) {
-    // turn the cards over one by one
-    const els = cards.querySelectorAll('.tc');
-    for (const [i, c] of cast.cards.entries()) {
-      const el = els[i];
-      el.querySelector('small').textContent = state.mode === 'tarot-yesno' ? '' : c.position;
-      el.querySelector('b').textContent = c.glyph;
-      el.querySelector('span').innerText = `${c.name}\n${c.zh}`;
-      el.querySelector('em').textContent = c.reversed ? 'Reversed' : '';
-      el.className = 'tc' + (c.reversed ? ' rev' : '');
-      if (!reduced) await sleep(260);
-    }
-    $('#r-name').innerHTML = cast.verdict ? `<span class="verdict">${esc(cast.verdict)}</span>` : '';
-  } else {
-    // reveal lines bottom to top, like six tosses
-    const rows = hex.querySelectorAll('.ln');
-    for (let i = 0; i < 6; i++) { rows[i].className = 'ln ' + (cast.lines[i] ? 'yang' : 'yin'); if (!reduced) await sleep(170); }
-    $('#r-name').textContent = `${cast.n} · ${cast.name}`;
-    if (yesno) {
-      rows[cast.moving - 1].classList.add('moving');
-      $('#r-name').innerHTML += `<small>Line ${cast.moving} moves → ${cast.changed.n} · ${esc(cast.changed.name)}<br>${esc(cast.time)}</small>`;
-    }
+// ---- the keepsake ----
+let image = null;
+function finish(data, mode) {
+  const e = { ts: Date.now(), day: dayKey(), question: state.question, mode, cast: data.cast, reading: data.reading };
+  save('oracle.readings', [...load('oracle.readings', []), e].slice(-60));
+  const fresh = recordToday();
+  const reward = fresh && sky().lit === 7 ? completeConstellation() : '';
+  show(e, fresh, reward);
+  $('#q').value = ''; $('#n').textContent = '0'; $('#next').disabled = true;
+  maybeA2HS();
+}
+function show(e, fresh = false, reward = '') {
+  const tarot = e.mode.startsWith('tarot'), c = e.cast, r = e.reading;
+  $('#r-date').textContent = new Date(e.ts).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+  $('#r-q').textContent = `“${e.question}”`;
+  $('#r-sign').innerHTML = tarot
+    ? `<div class="slots" style="--n:${c.cards.length}">${c.cards.map((x, i) => cardHTML(x, POSITIONS[e.mode][i])).join('')}</div>`
+    : `<span class="wm${c.zh?.length > 1 ? ' two' : ''}" aria-hidden="true">${esc(c.zh)}</span>${hexHTML(c.lines, e.mode === 'yesno' ? c.moving : 0)}`;
+  $('#r-name').innerHTML = tarot ? esc(c.verdict || '') : `${c.n} · ${esc(c.name)}<span>${esc(c.zh)}</span>`;
+  $('#r-name').hidden = tarot && !c.verdict;
+  $('#r-title').textContent = r.title;
+  $('#r-body').textContent = r.body; $('#r-body').hidden = !r.body;
+  $('#r-step p').textContent = r.step; $('#r-step').hidden = !r.step;
+  $('#r-how').textContent = {
+    yesno: () => `Cast from the moment you tapped: ${c.time}. Year, month, day, hour, minute and second pick the hexagram. Line ${c.moving} (marked) is moving, so it is turning into ${c.changed.n} · ${c.changed.name} ${c.changed.zh || ''}.`,
+    guidance: () => `Six tosses of three coins, bottom line first. Keywords: ${c.keywords}. ${c.advice}`,
+    'tarot-yesno': () => `Three cards from a 78-card deck. ${c.cards.filter((x) => !x.reversed).length} of 3 landed upright, which gives "${c.verdict}". ${c.cards.map((x) => `${x.name} ${x.zh}${x.reversed ? ', reversed' : ''}`).join('; ')}.`,
+    'tarot-guidance': () => c.cards.map((x) => `${x.position}: ${x.name} ${x.zh}${x.reversed ? ', reversed' : ''}`).join('. ') + '.',
+  }[e.mode]();
+  renderRitual($('#ritual-result'), fresh, reward);
+  image = renderImage(e).catch((err) => { console.error(err); return null; });
+  go('result');
+}
+function openDay(day) {
+  const e = load('oracle.readings', []).filter((x) => x.day === day).at(-1);
+  if (e) { state.run = null; show(e); }
+}
+$('#save').addEventListener('click', async () => {
+  const blob = await image; if (!blob) return;
+  const file = new File([blob], 'oracle-reading.png', { type: 'image/png' });
+  if (navigator.canShare?.({ files: [file] })) {
+    try { await navigator.share({ files: [file] }); return; } catch (err) { if (err.name === 'AbortError') return; }
   }
-  reading.innerHTML = `<h3>${esc(r.title)}</h3>${r.body ? `<p>${esc(r.body)}</p>` : ''}` +
-    (r.step ? `<div class="step"><span>Small step</span>${esc(r.step)}</div>` : '');
-  requestAnimationFrame(() => (reading.className = 'reading on'));
-  renderRitual($('#ritual-result'), recordToday());
-  renderRitual($('#ritual-start'));
-  $('#q').value = ''; $('#n').textContent = '0';
+  const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: 'oracle-reading.png' });
+  a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 5000);
 });
 
-function esc(s) { return String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]); }
+// Story-sized (1080x1920) image of the keepsake, drawn on a canvas so it looks the same on every phone.
+const SPARK_PATH = 'M10 0C11 7 13 9 20 10 13 11 11 13 10 20 9 13 7 11 0 10 7 9 9 7 10 0Z';
+function wrap(x, text, w) {
+  const out = []; let line = '';
+  for (const word of String(text).split(/\s+/)) {
+    const t = line ? line + ' ' + word : word;
+    if (x.measureText(t).width > w && line) { out.push(line); line = word; } else line = t;
+  }
+  if (line) out.push(line);
+  return out;
+}
+async function renderImage(e) {
+  const tarot = e.mode.startsWith('tarot'), c = e.cast, r = e.reading;
+  await Promise.all([['italic 72px "Instrument Serif"'], ['400 72px "Instrument Serif"'], ['400 30px Jost'], ['500 20px Jost'],
+    ['500 60px "Noto Serif SC"', (c.zh || '') + (c.cards || []).map((x) => x.zh).join('')]].map(([f, t]) => document.fonts.load(f, t || '六').catch(() => {})));
+  const W = 1080, H = 1920, cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+  const x = cv.getContext('2d'), spark = new Path2D(SPARK_PATH);
+  const star = (cx, cy, s, col) => { x.save(); x.translate(cx - s, cy - s); x.scale(s / 10, s / 10); x.fillStyle = col; x.fill(spark); x.restore(); };
+  const g = x.createLinearGradient(0, 0, 0, H); g.addColorStop(0, '#1d2347'); g.addColorStop(.6, '#2d2f5e'); g.addColorStop(1, '#4a3f6b');
+  x.fillStyle = g; x.fillRect(0, 0, W, H);
+  let seed = 11; const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+  for (let i = 0; i < 110; i++) {
+    const sx = rnd() * W, sy = rnd() * H;
+    if (rnd() < .2) star(sx, sy, 6 + rnd() * 12, '#f2d8a7');
+    else { x.globalAlpha = .4 + rnd() * .5; x.fillStyle = '#f6efe0'; x.beginPath(); x.arc(sx, sy, 1.5 + rnd() * 2, 0, 7); x.fill(); x.globalAlpha = 1; }
+  }
+  const CW = 920, CX = (W - CW) / 2, P = 76, IW = CW - P * 2, mid = W / 2;
+  // measure, shrinking the body until the card fits
+  let blocks, total;
+  for (let bs = 34; ; bs -= 2) {
+    blocks = [];
+    const text = (font, color, str, lh, opts = {}) => { x.font = font; x.letterSpacing = opts.ls || '0px'; let lines = wrap(x, str, IW); if (opts.max) lines = lines.slice(0, opts.max); blocks.push({ k: 'text', font, color, lines, lh, ls: opts.ls, h: lines.length * lh }); };
+    const gap = (h) => blocks.push({ k: 'gap', h });
+    text('500 22px Jost', '#6f6888', new Date(e.ts).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }).toUpperCase(), 30, { ls: '6px' });
+    gap(20); text('italic 40px "Instrument Serif"', '#6f6888', `“${e.question}”`, 48, { max: 3 });
+    gap(26);
+    if (tarot) { const n = c.cards.length, cw = Math.min(176, (IW - (n - 1) * 22) / n); blocks.push({ k: 'cards', cw, ch: cw * 1.6, h: cw * 1.6 + (e.mode === 'tarot-guidance' ? 44 : 0) + 34 }); }
+    else blocks.push({ k: 'hex', h: 6 * 26 + 5 * 24 + 40 });
+    const name = tarot ? c.verdict || '' : `${c.n} · ${c.name.toUpperCase()}  ${c.zh || ''}`;
+    if (name) { gap(16); text('400 32px "Instrument Serif"', '#6f6888', name, 40, { ls: '4px' }); }
+    gap(30); text('italic 80px "Instrument Serif"', '#2b2740', r.title, 86);
+    if (r.body) { gap(26); text(`400 ${bs}px Jost`, '#2b2740', r.body, Math.round(bs * 1.5)); }
+    if (r.step) {
+      x.font = '400 30px Jost'; x.letterSpacing = '0px';
+      const lines = wrap(x, r.step, IW - 64);
+      gap(34); blocks.push({ k: 'step', lines, h: 36 + 30 + 12 + lines.length * 44 + 32 });
+    }
+    total = blocks.reduce((s, b) => s + b.h, 0) + P * 2;
+    if (total <= 1560 || bs <= 24) break;
+  }
+  const top = Math.max(150, (H - total) / 2), bottom = top + total;
+  // lace card: scalloped edges, eyelets, inner border
+  x.save(); x.shadowColor = 'rgba(8,8,30,.45)'; x.shadowBlur = 60; x.shadowOffsetY = 26; x.fillStyle = '#fbf6ec';
+  const n = Math.round(CW / 40), step = CW / n;
+  x.beginPath(); x.rect(CX, top, CW, total); // one path so the shadow is cast once, not per scallop
+  for (let i = 0; i < n; i++) for (const y of [top, bottom]) { x.moveTo(CX + step * (i + 1), y); x.arc(CX + step * (i + .5), y, step / 2 - 1, 0, 2 * Math.PI); }
+  x.fill('nonzero'); x.restore();
+  x.fillStyle = '#d8c9a8';
+  for (let i = 0; i < n; i++) for (const y of [top - 10, bottom + 10]) { x.beginPath(); x.arc(CX + step * (i + .5), y, 3.6, 0, 7); x.fill(); }
+  x.strokeStyle = '#d8c9a8'; x.lineWidth = 2; x.beginPath(); x.roundRect(CX + 22, top + 22, CW - 44, total - 44, 16); x.stroke();
+  x.textAlign = 'center'; x.textBaseline = 'middle';
+  let y = top + P;
+  for (const b of blocks) {
+    if (b.k === 'text') {
+      x.font = b.font; x.fillStyle = b.color; x.letterSpacing = b.ls || '0px';
+      b.lines.forEach((l, i) => x.fillText(l, mid, y + b.lh * i + b.lh / 2));
+      x.letterSpacing = '0px';
+    } else if (b.k === 'hex') {
+      const hw = 360, lh = 26, lg = 24, y0 = y + 20;
+      if (c.zh) { x.save(); x.globalAlpha = .09; x.fillStyle = '#a8822f'; x.font = `500 ${c.zh.length > 1 ? 190 : 270}px "Noto Serif SC"`; x.fillText(c.zh, mid, y + b.h / 2 + 10); x.restore(); }
+      c.lines.forEach((l, i) => {
+        const ly = y0 + (5 - i) * (lh + lg), moving = e.mode === 'yesno' && i === c.moving - 1;
+        x.fillStyle = moving ? '#2b2740' : '#a8822f';
+        if (l) x.fillRect(mid - hw / 2, ly, hw, lh);
+        else { const half = (hw - 64) / 2; x.fillRect(mid - hw / 2, ly, half, lh); x.fillRect(mid + hw / 2 - half, ly, half, lh); }
+        if (moving) star(mid + hw / 2 + 40, ly + lh / 2, 14, '#2b2740');
+      });
+    } else if (b.k === 'cards') {
+      const cs = c.cards, span = cs.length * b.cw + (cs.length - 1) * 22, labels = e.mode === 'tarot-guidance';
+      cs.forEach((card, i) => {
+        const cx = mid - span / 2 + i * (b.cw + 22), cy = y + (labels ? 44 : 0);
+        if (labels) { x.font = '500 18px Jost'; x.letterSpacing = '2px'; x.fillStyle = '#6f6888'; x.fillText(card.position.toUpperCase(), cx + b.cw / 2, y + 16); x.letterSpacing = '0px'; }
+        x.save(); x.translate(cx + b.cw / 2, cy + b.ch / 2); if (card.reversed) x.rotate(Math.PI);
+        x.fillStyle = card.reversed ? '#f3ead6' : '#fff'; x.strokeStyle = '#d8c9a8'; x.lineWidth = 2;
+        x.beginPath(); x.roundRect(-b.cw / 2, -b.ch / 2, b.cw, b.ch, 14); x.fill(); x.stroke();
+        x.fillStyle = '#a8822f'; x.font = '400 56px "Instrument Serif"'; x.fillText(card.glyph, 0, -b.ch * .2);
+        x.fillStyle = '#2b2740'; x.font = '400 24px "Instrument Serif"';
+        wrap(x, card.name, b.cw - 20).slice(0, 3).forEach((l, k) => x.fillText(l, 0, b.ch * .08 + k * 26));
+        x.fillStyle = '#6f6888'; x.font = '400 20px "Noto Serif SC"'; x.fillText(card.zh, 0, b.ch * .38);
+        x.restore();
+        if (card.reversed) { x.font = '500 16px Jost'; x.letterSpacing = '2px'; x.fillStyle = '#a8822f'; x.fillText('REVERSED', cx + b.cw / 2, cy + b.ch + 20); x.letterSpacing = '0px'; }
+      });
+    } else if (b.k === 'step') {
+      x.fillStyle = '#f3ead6'; x.beginPath(); x.roundRect(CX + P, y, IW, b.h, 26); x.fill();
+      x.strokeStyle = '#a8822f'; x.setLineDash([6, 6]); x.lineWidth = 2; x.stroke(); x.setLineDash([]);
+      x.font = '500 20px Jost'; x.letterSpacing = '5px'; x.fillStyle = '#a8822f'; x.fillText('SMALL STEP', mid + 14, y + 51);
+      const lw = x.measureText('SMALL STEP').width; x.letterSpacing = '0px';
+      star(mid + 14 - lw / 2 - 22, y + 51, 10, '#a8822f');
+      x.font = '400 30px Jost'; x.fillStyle = '#2b2740';
+      b.lines.forEach((l, i) => x.fillText(l, mid, y + 36 + 30 + 12 + i * 44 + 22));
+    }
+    y += b.h;
+  }
+  x.fillStyle = '#f6efe0';
+  if (top >= 170) { x.font = 'italic 64px "Instrument Serif"'; x.fillText('Oracle', mid, top - 80); }
+  x.globalAlpha = .7; x.font = '400 26px Jost'; x.letterSpacing = '3px'; x.fillText(location.host || 'oracle-divination.vercel.app', mid, Math.min(H - 60, bottom + 90));
+  return new Promise((res) => cv.toBlob(res, 'image/png'));
+}
+
+// ---- add to home screen: the cheapest way back tomorrow ----
+let installEvt = null;
+addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); installEvt = e; });
+function maybeA2HS() {
+  const el = $('#a2hs');
+  if (matchMedia('(display-mode: standalone)').matches || navigator.standalone || load('oracle.a2hs', false)) return;
+  const ios = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  if (!ios && !installEvt) return;
+  el.hidden = false;
+  el.innerHTML = ios ? '<p>Make it a daily ritual: tap <b>Share</b>, then <b>Add to Home Screen</b>.</p><button class="x" aria-label="Dismiss">&times;</button>'
+    : '<p>Make it a daily ritual.</p><button class="btn" id="install">Add to Home Screen</button><button class="x" aria-label="Dismiss">&times;</button>';
+  el.querySelector('.x').onclick = () => { el.hidden = true; save('oracle.a2hs', true); };
+  el.querySelector('#install')?.addEventListener('click', async () => { installEvt.prompt(); await installEvt.userChoice; installEvt = null; el.hidden = true; save('oracle.a2hs', true); });
+}
+
+applyBack(); renderRitual($('#ritual-start')); renderBacks(); loadToday(); doors();
 </script>
 </body>
 </html>

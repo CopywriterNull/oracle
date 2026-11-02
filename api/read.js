@@ -38,9 +38,12 @@ export async function POST(request) {
     if (body.timeZone) timeZone = body.timeZone;
   } catch {}
 
-  const moment = lunarMoment(new Date(), timeZone);
+  // Quick Liu Yao casts from the second the user tapped the dial; trust their clock only if it is within 2 minutes of ours.
+  const at = Number(body.at);
+  const when = Math.abs(at - Date.now()) < 120e3 ? new Date(at) : new Date();
+  const moment = lunarMoment(when, timeZone);
   let cast;
-  if (mode === 'yesno') cast = { ...quickLiuyao(moment), time: `${moment.yearName} ${moment.month}月${moment.day}日 ${moment.hourName} ${moment.clock}` };
+  if (mode === 'yesno') cast = { ...quickLiuyao(moment), clock: moment.clock, time: `${moment.yearName} ${moment.month}月${moment.day}日 ${moment.hourName} ${moment.clock}` };
   else if (mode === 'guidance') cast = castHexagram();
   else {
     const cards = draw(mode);

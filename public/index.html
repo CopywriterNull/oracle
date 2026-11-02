@@ -50,7 +50,7 @@ button{font:inherit;color:inherit}
 .sky i.shoot{width:150px;height:2px;border-radius:2px;background:linear-gradient(90deg,transparent,#fff);rotate:156deg;animation:shoot 1.2s ease-out forwards}
 @keyframes shoot{0%{opacity:0;translate:0 0}15%{opacity:1}100%{opacity:0;translate:-340px 150px}}
 
-main{position:relative;z-index:1;max-width:440px;margin:0 auto;min-height:100dvh;padding:calc(16px + env(safe-area-inset-top)) 20px calc(24px + env(safe-area-inset-bottom));display:flex;flex-direction:column}
+main{position:relative;z-index:1;max-width:440px;margin:0 auto;min-height:100dvh;padding:calc(30px + env(safe-area-inset-top)) 20px calc(24px + env(safe-area-inset-bottom));display:flex;flex-direction:column}
 .screen{display:none;flex:1;flex-direction:column;animation:fade .45s ease both}
 .screen.on{display:flex}
 @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
@@ -64,16 +64,15 @@ h2{font-size:34px;line-height:1.1;margin:6px 0 18px}
 .sub{text-align:center;color:var(--page-muted);font:italic 21px/1.3 var(--serif);margin-top:8px}
 .foot{margin-top:auto;padding-top:20px}
 
-/* lace paper: scalloped top and bottom edges with eyelets */
-.lace{--s:12px;position:relative;color:var(--ink);padding:calc(var(--s) + 22px) 22px;
+/* lace paper: cream polka-dot paper with real Chantilly lace trim sewn on top and bottom (assets in /lace, made by design/lace.mjs) */
+.lace{--s:30px;position:relative;color:var(--ink);padding:calc(var(--s) + 22px) 22px;
   background:
-    radial-gradient(circle at 50% 7px,var(--line) 1.7px,transparent 2.3px) 0 0/20px var(--s) round no-repeat,
-    radial-gradient(circle at 50% 5px,var(--line) 1.7px,transparent 2.3px) 0 100%/20px var(--s) round no-repeat,
-    radial-gradient(circle at 50% 100%,var(--card) 9.5px,transparent 10px) 0 0/20px var(--s) round no-repeat,
-    radial-gradient(circle at 50% 0,var(--card) 9.5px,transparent 10px) 0 100%/20px var(--s) round no-repeat,
+    url(/lace/trim-up.webp) 0 0/auto var(--s) repeat-x,
+    url(/lace/trim-down.webp) 0 100%/auto var(--s) repeat-x,
     linear-gradient(var(--card),var(--card)) 0 var(--s)/100% calc(100% - 2 * var(--s)) no-repeat;
   filter:drop-shadow(0 18px 22px rgba(8,8,30,.4))}
 .lace::before{content:"";position:absolute;inset:calc(var(--s) + 7px) 7px;border:1px solid var(--line);border-radius:9px;pointer-events:none;
+  background:radial-gradient(rgba(168,130,47,.13) 1.6px,transparent 2.2px) 0 0/16px 16px;
   -webkit-mask:radial-gradient(circle at 0 0,#0000 14px,#000 15px) top left/51% 51% no-repeat,radial-gradient(circle at 100% 0,#0000 14px,#000 15px) top right/51% 51% no-repeat,radial-gradient(circle at 0 100%,#0000 14px,#000 15px) bottom left/51% 51% no-repeat,radial-gradient(circle at 100% 100%,#0000 14px,#000 15px) bottom right/51% 51% no-repeat;
   mask:radial-gradient(circle at 0 0,#0000 14px,#000 15px) top left/51% 51% no-repeat,radial-gradient(circle at 100% 0,#0000 14px,#000 15px) top right/51% 51% no-repeat,radial-gradient(circle at 0 100%,#0000 14px,#000 15px) bottom left/51% 51% no-repeat,radial-gradient(circle at 100% 100%,#0000 14px,#000 15px) bottom right/51% 51% no-repeat}
 
@@ -121,10 +120,18 @@ h2{font-size:34px;line-height:1.1;margin:6px 0 18px}
 /* 1. start */
 .start{flex:1;display:flex;flex-direction:column;justify-content:center;gap:6px}
 .altar{position:relative;height:212px;display:grid;place-items:center;margin:4px 0}
-.doily{position:absolute;inset:0;margin:auto;width:212px;height:212px;animation:turn 240s linear infinite}
+.doily{position:absolute;inset:0;margin:auto;width:222px;height:222px;background:url(/lace/doily.webp) center/contain no-repeat;opacity:.92;animation:turn 240s linear infinite;filter:drop-shadow(0 10px 18px rgba(0,0,0,.35))}
 @keyframes turn{to{rotate:360deg}}
 .daycard{position:relative;width:112px;height:176px;border-radius:10px;rotate:-5deg;box-shadow:0 16px 30px -12px #000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--gold-deep)}
-.daycard.faceup{background:var(--card);border:1px solid var(--line)}
+.daycard.faceup{background:radial-gradient(rgba(168,130,47,.12) 1.4px,transparent 2px) 0 0/12px 12px,var(--card);border:1px solid var(--line)}
+.daycard.faceup::before{content:"";position:absolute;top:-22px;left:50%;width:52px;height:46px;translate:-50% 0;background:url(/lace/bow.webp) center/contain no-repeat;filter:drop-shadow(0 4px 4px rgba(0,0,0,.25))}
+.lc{position:absolute;width:62px;height:62px;background:url(/lace/corner.webp) 0 0/contain no-repeat;opacity:.7;pointer-events:none}
+.lc.tl{top:calc(var(--s) + 4px);left:4px}.lc.tr{top:calc(var(--s) + 4px);right:4px;scale:-1 1}
+.lc.bl{bottom:calc(var(--s) + 4px);left:4px;scale:1 -1}.lc.br{bottom:calc(var(--s) + 4px);right:4px;scale:-1 -1}
+.bow{position:absolute;top:-14px;left:50%;width:84px;height:74px;translate:-50% 0;background:url(/lace/bow.webp) center/contain no-repeat;filter:drop-shadow(0 6px 6px rgba(0,0,0,.3));pointer-events:none}
+/* lace curtain over the sky, and a lace valance along the top of the page */
+.sky::before{content:"";position:absolute;inset:0;background:url(/lace/fabric.webp) 0 0/280px;opacity:.07}
+body::before{content:"";position:absolute;top:0;left:0;right:0;height:30px;background:url(/lace/trim-down.webp) 0 0/auto 30px repeat-x;z-index:2;pointer-events:none;opacity:.95}
 .daycard .hex{--w:58px;--lh:6px;--gap:6px}
 .daycard b{font:400 34px/1 var(--serif)}
 .daycard .zh{font:500 20px var(--zh);color:var(--ink)}
@@ -213,7 +220,7 @@ h2{font-size:34px;line-height:1.1;margin:6px 0 18px}
 .err{color:var(--gold);text-align:center;line-height:1.5}
 
 /* 5. result keepsake */
-.keep{text-align:center;display:flex;flex-direction:column;align-items:center;gap:14px;padding-top:44px;padding-bottom:40px}
+.keep{--s:44px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:14px;padding-top:calc(var(--s) + 44px);padding-bottom:calc(var(--s) + 32px);margin-top:10px}
 .date{font-size:11px;font-weight:500;letter-spacing:.24em;text-transform:uppercase;color:var(--muted)}
 .yourq{font:italic 19px/1.4 var(--serif);color:var(--muted);text-wrap:balance}
 .sign{position:relative;display:grid;place-items:center;width:100%;padding:12px 0;color:var(--gold-deep)}
@@ -249,7 +256,11 @@ button.star:hover svg{transform:scale(1.25)}
 .a2hs .btn{width:auto;padding:9px 14px;font-size:14px}
 .a2hs .x{background:none;border:0;color:var(--page-muted);font-size:22px;line-height:1;cursor:pointer;padding:4px}
 .note{font-size:12px;color:var(--page-muted);text-align:center;margin-top:16px}
-.lang{position:absolute;top:calc(18px + env(safe-area-inset-top));right:20px;z-index:2;background:rgba(246,239,224,.08);border:1px solid rgba(242,216,167,.45);border-radius:99px;padding:6px 14px;font-size:14px;cursor:pointer;color:var(--page-ink)}
+.tools{position:absolute;top:calc(34px + env(safe-area-inset-top));right:20px;z-index:2;display:flex;gap:8px}
+.music{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;cursor:pointer;background:rgba(246,239,224,.08);border:1px solid rgba(242,216,167,.45);opacity:.55;transition:opacity .3s,box-shadow .3s}
+.music svg{width:17px;height:17px;fill:var(--gold)}
+.music[aria-pressed=true]{opacity:1;box-shadow:0 0 14px rgba(242,216,167,.45)}
+.lang{background:rgba(246,239,224,.08);border:1px solid rgba(242,216,167,.45);border-radius:99px;padding:6px 14px;font-size:14px;cursor:pointer;color:var(--page-ink)}
 html[lang^=zh] *{font-style:normal!important}
 html[lang^=zh] .door .zh{display:none}
 html[lang^=zh] h1{font-size:46px}
@@ -261,7 +272,10 @@ html[lang^=zh] .kicker,html[lang^=zh] .today .lbl{letter-spacing:.2em}
 <body>
 <div class="sky" aria-hidden="true"><div class="layer"></div><div class="layer"></div><div class="layer"></div></div>
 <main>
-  <button class="lang" id="lang" aria-label="Switch language">中文</button>
+  <div class="tools">
+    <button class="music" id="music" aria-pressed="false" aria-label="Background music"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18.5a2.5 2.5 0 1 1-2-2.45V5l11-2v12.5a2.5 2.5 0 1 1-2-2.45V7.1l-7 1.3z"/></svg></button>
+    <button class="lang" id="lang" aria-label="Switch language">中文</button>
+  </div>
   <!-- 1. start -->
   <section class="screen on" id="s-start" aria-labelledby="t-start">
     <div class="start">
@@ -333,6 +347,7 @@ html[lang^=zh] .kicker,html[lang^=zh] .today .lbl{letter-spacing:.2em}
   <section class="screen" id="s-result" aria-labelledby="r-title">
     <div class="top"><button class="back" data-go="start" data-t="home">&larr; Home</button></div>
     <article class="lace keep" aria-live="polite">
+      <i class="lc tl"></i><i class="lc tr"></i><i class="lc bl"></i><i class="lc br"></i><i class="bow"></i>
       <p class="date" id="r-date"></p>
       <p class="yourq" id="r-q"></p>
       <div class="sign" id="r-sign"></div>
@@ -457,6 +472,7 @@ function applyLang() {
   document.querySelectorAll('[data-t]').forEach((el) => (el.innerHTML = t(el.dataset.t)));
   document.querySelectorAll('[data-tp]').forEach((el) => (el.placeholder = t(el.dataset.tp)));
   $('#lang').textContent = t('lang');
+  $('#music').setAttribute('aria-label', lang === 'zh' ? '背景音乐' : 'Background music');
   $('#prompt-q').textContent = todays(t('prompts'));
   doors(); renderRitual($('#ritual-start')); renderBacks();
   if (lastSign) renderToday(lastSign);
@@ -485,11 +501,6 @@ document.addEventListener('click', (e) => {
       return big ? `<i style="${pos}">${SPARK}</i>` : `<i class="dot" style="${pos};opacity:${(.35 + r() * .5).toFixed(2)}"></i>`;
     }).join('');
   });
-  // the doily under today's sign
-  const ring = (n, rad, r2) => Array.from({ length: n }, (_, i) => { const a = (i / n) * 2 * Math.PI; return `<circle cx="${(100 + rad * Math.cos(a)).toFixed(1)}" cy="${(100 + rad * Math.sin(a)).toFixed(1)}" r="${r2}"/>`; }).join('');
-  $('.doily').innerHTML = `<svg viewBox="0 0 200 200"><g fill="#f6efe0" opacity=".13">${ring(30, 86, 11)}<circle cx="100" cy="100" r="86"/></g>
-    <g fill="#1d2347" opacity=".5">${ring(30, 88, 2.4)}${ring(20, 64, 2)}</g>
-    <g fill="none" stroke="#f2d8a7" opacity=".4"><circle cx="100" cy="100" r="74" stroke-dasharray="1.5 4"/><circle cx="100" cy="100" r="54"/></g></svg>`;
 })();
 function shoot() {
   if (reduced) return;
@@ -559,12 +570,13 @@ const hexHTML = (lines, moving) => `<div class="hex">${lines.map((l, i) => `<div
 async function loadToday() {
   let s = load('oracle.sign', null);
   if (s?.day !== dayKey()) {
-    try { s = await (await fetch('/api/daily?d=' + dayKey())).json(); save('oracle.sign', s); } catch { return; }
+    try { s = await (await fetch('/api/daily?d=' + dayKey())).json(); if (s?.kind) save('oracle.sign', s); } catch { return; }
   }
   renderToday(s);
 }
 let lastSign = null;
 function renderToday(s) {
+  if (!s?.kind) return;
   lastSign = s;
   const dc = $('#daycard');
   dc.className = 'daycard faceup';
@@ -756,6 +768,8 @@ $('#save').addEventListener('click', async () => {
 
 // Story-sized (1080x1920) image of the keepsake, drawn on a canvas so it looks the same on every phone.
 const SANS = 'Jost, "Noto Serif SC", sans-serif', SERIF = '"Instrument Serif", "Noto Serif SC", serif';
+const LACE = {};
+const laceImg = (n) => (LACE[n] ??= new Promise((r) => { const i = new Image(); i.onload = () => r(i); i.onerror = () => r(null); i.src = `/lace/${n}.webp`; }));
 const SPARK_PATH = 'M10 0C11 7 13 9 20 10 13 11 11 13 10 20 9 13 7 11 0 10 7 9 9 7 10 0Z';
 // breaks between words, or between any two Chinese characters, but never before punctuation
 function wrap(x, text, w) {
@@ -806,18 +820,25 @@ async function renderImage(e) {
       gap(34); blocks.push({ k: 'step', lines, h: 36 + 30 + 12 + lines.length * 44 + 32 });
     }
     total = blocks.reduce((s, b) => s + b.h, 0) + P * 2;
-    if (total <= 1560 || bs <= 24) break;
+    if (total <= 1480 || bs <= 24) break;
   }
-  const top = Math.max(150, (H - total) / 2), bottom = top + total;
-  // lace card: scalloped edges, eyelets, inner border
+  const top = Math.max(170, (H - total) / 2 + 10), bottom = top + total;
+  // lace card: polka-dot paper, inner border, lace corners, lace trim top and bottom, satin bow
+  const [tu, td, cn, bw] = await Promise.all(['trim-up', 'trim-down', 'corner', 'bow'].map(laceImg));
   x.save(); x.shadowColor = 'rgba(8,8,30,.45)'; x.shadowBlur = 60; x.shadowOffsetY = 26; x.fillStyle = '#fbf6ec';
-  const n = Math.round(CW / 40), step = CW / n;
-  x.beginPath(); x.rect(CX, top, CW, total); // one path so the shadow is cast once, not per scallop
-  for (let i = 0; i < n; i++) for (const y of [top, bottom]) { x.moveTo(CX + step * (i + 1), y); x.arc(CX + step * (i + .5), y, step / 2 - 1, 0, 2 * Math.PI); }
-  x.fill('nonzero'); x.restore();
-  x.fillStyle = '#d8c9a8';
-  for (let i = 0; i < n; i++) for (const y of [top - 10, bottom + 10]) { x.beginPath(); x.arc(CX + step * (i + .5), y, 3.6, 0, 7); x.fill(); }
+  x.fillRect(CX, top, CW, total); x.restore();
+  x.fillStyle = 'rgba(168,130,47,.13)';
+  for (let dy = top + 40; dy < bottom - 30; dy += 34) for (let dx = CX + 40; dx < CX + CW - 30; dx += 34) { x.beginPath(); x.arc(dx, dy, 3.2, 0, 7); x.fill(); }
   x.strokeStyle = '#d8c9a8'; x.lineWidth = 2; x.beginPath(); x.roundRect(CX + 22, top + 22, CW - 44, total - 44, 16); x.stroke();
+  if (cn) for (const [sx, sy] of [[1, 1], [-1, 1], [1, -1], [-1, -1]]) {
+    x.save(); x.globalAlpha = .6; x.translate(sx > 0 ? CX + 14 : CX + CW - 14, sy > 0 ? top + 14 : bottom - 14); x.scale(sx, sy); x.drawImage(cn, 0, 0, 130, 130 * cn.height / cn.width); x.restore();
+  }
+  const band = 58, tile = (im, y) => {
+    if (!im) return; const w = im.width * band / im.height;
+    x.save(); x.beginPath(); x.rect(CX, y, CW, band); x.clip(); for (let lx = CX; lx < CX + CW; lx += w) x.drawImage(im, lx, y, w, band); x.restore();
+  };
+  tile(tu, top - band); tile(td, bottom);
+  if (bw) x.drawImage(bw, mid - 100, top - band - 40, 200, 200 * bw.height / bw.width);
   x.textAlign = 'center'; x.textBaseline = 'middle';
   let y = top + P;
   for (const b of blocks) {
@@ -863,10 +884,63 @@ async function renderImage(e) {
     y += b.h;
   }
   x.fillStyle = '#f6efe0';
-  if (top >= 170) { x.font = 'italic 64px "Instrument Serif"'; x.fillText('Oracle', mid, top - 80); }
-  x.globalAlpha = .7; x.font = '400 26px Jost'; x.letterSpacing = '3px'; x.fillText(location.host || 'oracle-divination.vercel.app', mid, Math.min(H - 60, bottom + 90));
+  if (top >= 250) { x.font = 'italic 64px "Instrument Serif"'; x.fillText('Oracle', mid, top - 150); }
+  x.globalAlpha = .7; x.font = '400 26px Jost'; x.letterSpacing = '3px'; x.fillText(location.host || 'oracle-divination.vercel.app', mid, Math.min(H - 50, bottom + 120));
   return new Promise((res) => cv.toBlob(res, 'image/png'));
 }
+
+// ---- calm background music: a soft pad with chimes, played live in Web Audio (no audio file) ----
+const music = { ctx: null, out: null, timers: [], on: false };
+const hz = (m) => 440 * 2 ** ((m - 69) / 12);
+const CHORDS = [[50, 57, 62, 66, 69], [47, 54, 62, 66, 69], [43, 50, 59, 62, 66], [45, 52, 61, 64, 71]]; // D, Bm7, Gmaj7, A
+const BELLS = [74, 76, 78, 81, 83, 86]; // D major pentatonic, so any two chimes sound right together
+function voice(f, t, { attack, hold, release, peak, type = 'sine' }) {
+  const { ctx, out } = music, o = ctx.createOscillator(), g = ctx.createGain();
+  o.type = type; o.frequency.value = f; o.detune.value = (Math.random() - .5) * 10;
+  g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(peak, t + attack);
+  g.gain.setValueAtTime(peak, t + attack + hold); g.gain.linearRampToValueAtTime(0, t + attack + hold + release);
+  o.connect(g); g.connect(out); o.start(t); o.stop(t + attack + hold + release + .1);
+}
+function musicLoop() {
+  let i = 0;
+  const pad = () => {
+    const t = music.ctx.currentTime + .05;
+    CHORDS[i++ % CHORDS.length].forEach((m, k) => voice(hz(m), t, { attack: 3, hold: 5.5, release: 4, peak: k ? .028 : .04, type: k % 2 ? 'triangle' : 'sine' }));
+    music.timers.push(setTimeout(pad, 8500));
+  };
+  const bell = () => {
+    const t = music.ctx.currentTime + .05, f = hz(BELLS[Math.floor(Math.random() * BELLS.length)]);
+    voice(f, t, { attack: .01, hold: 0, release: 3.5, peak: .035 }); voice(f * 2, t, { attack: .01, hold: 0, release: 1.6, peak: .008 });
+    music.timers.push(setTimeout(bell, 2500 + Math.random() * 4500));
+  };
+  pad(); music.timers.push(setTimeout(bell, 2000));
+}
+function setMusic(on) {
+  music.on = on; save('oracle.music', on);
+  $('#music').setAttribute('aria-pressed', on);
+  if (on && !music.ctx) {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)(), out = ctx.createGain();
+    const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 2000;
+    const verb = ctx.createConvolver(), len = ctx.sampleRate * 4, ir = ctx.createBuffer(2, len, ctx.sampleRate), wet = ctx.createGain();
+    for (let ch = 0; ch < 2; ch++) { const d = ir.getChannelData(ch); for (let k = 0; k < len; k++) d[k] = (Math.random() * 2 - 1) * (1 - k / len) ** 3; }
+    verb.buffer = ir; wet.gain.value = .55; out.gain.value = 0;
+    out.connect(lp); lp.connect(ctx.destination); lp.connect(verb); verb.connect(wet); wet.connect(ctx.destination);
+    Object.assign(music, { ctx, out });
+  }
+  if (!music.ctx) return;
+  const g = music.out.gain, now = music.ctx.currentTime;
+  g.cancelScheduledValues(now); g.setValueAtTime(g.value, now);
+  music.timers.forEach(clearTimeout); music.timers = [];
+  if (on) { music.ctx.resume(); g.linearRampToValueAtTime(.8, now + 4); musicLoop(); }
+  else g.linearRampToValueAtTime(0, now + 1.5);
+}
+$('#music').addEventListener('click', () => setMusic(!music.on));
+// on by default, but browsers only allow sound after a tap, so it fades in on the first one
+if (load('oracle.music', true)) {
+  $('#music').setAttribute('aria-pressed', 'true');
+  addEventListener('pointerdown', function first(e) { removeEventListener('pointerdown', first); if (!e.target.closest('#music')) setMusic(true); });
+}
+document.addEventListener('visibilitychange', () => { if (music.ctx && music.on) document.hidden ? music.ctx.suspend() : music.ctx.resume(); });
 
 // ---- add to home screen: the cheapest way back tomorrow ----
 let installEvt = null;

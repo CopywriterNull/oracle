@@ -899,14 +899,15 @@ function voice(f, t, { attack, hold, release, peak, type = 'sine' }) {
 }
 function musicLoop() {
   let i = 0;
+  const live = () => music.ctx.state === 'running';
   const pad = () => {
     const t = music.ctx.currentTime + .05;
-    CHORDS[i++ % CHORDS.length].forEach((m, k) => voice(hz(m), t, { attack: 3, hold: 5.5, release: 4, peak: k ? .028 : .04, type: k % 2 ? 'triangle' : 'sine' }));
+    if (live()) CHORDS[i++ % CHORDS.length].forEach((m, k) => voice(hz(m), t, { attack: 3, hold: 5.5, release: 4, peak: k ? .028 : .04, type: k % 2 ? 'triangle' : 'sine' }));
     music.timers.push(setTimeout(pad, 8500));
   };
   const bell = () => {
     const t = music.ctx.currentTime + .05, f = hz(BELLS[Math.floor(Math.random() * BELLS.length)]);
-    voice(f, t, { attack: .01, hold: 0, release: 3.5, peak: .035 }); voice(f * 2, t, { attack: .01, hold: 0, release: 1.6, peak: .008 });
+    if (live()) { voice(f, t, { attack: .01, hold: 0, release: 3.5, peak: .035 }); voice(f * 2, t, { attack: .01, hold: 0, release: 1.6, peak: .008 }); }
     music.timers.push(setTimeout(bell, 2500 + Math.random() * 4500));
   };
   pad(); music.timers.push(setTimeout(bell, 2000));
@@ -930,11 +931,25 @@ function setMusic(on) {
   if (on) { music.ctx.resume(); g.linearRampToValueAtTime(.8, now + 4); musicLoop(); }
   else g.linearRampToValueAtTime(0, now + 1.5);
 }
-$('#music').addEventListener('click', () => setMusic(!music.on));
+// iPhone Safari only unlocks sound on a finger lift (touchend / click), not on touch-down, so listen for those
+// and keep listening until the audio is actually running.
+const GESTURES = ['touchend', 'click', 'keydown'];
+const stopUnlock = () => GESTURES.forEach((t) => removeEventListener(t, unlock, true));
+function unlock(e) {
+  if (e.target.closest?.('#music')) return; // the button handles itself
+  if (!music.ctx) setMusic(true);
+  music.ctx.resume().then(() => { if (music.ctx.state === 'running') stopUnlock(); }).catch(() => {});
+}
+$('#music').addEventListener('click', () => {
+  stopUnlock();
+  if ('audioSession' in navigator) navigator.audioSession.type = 'playback'; // they asked for sound, so play even with the silent switch on
+  const audible = music.on && music.ctx?.state === 'running';
+  setMusic(!audible); // "on" but still locked counts as off, so one tap starts it
+});
 // on by default, but browsers only allow sound after a tap, so it fades in on the first one
 if (load('oracle.music', true)) {
   $('#music').setAttribute('aria-pressed', 'true');
-  addEventListener('pointerdown', function first(e) { removeEventListener('pointerdown', first); if (!e.target.closest('#music')) setMusic(true); });
+  GESTURES.forEach((t) => addEventListener(t, unlock, true));
 }
 document.addEventListener('visibilitychange', () => { if (music.ctx && music.on) document.hidden ? music.ctx.suspend() : music.ctx.resume(); });
 

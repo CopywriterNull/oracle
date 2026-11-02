@@ -95,7 +95,25 @@ textarea::placeholder{color:#b9aea4}
 .yourq{font-family:var(--serif);font-style:italic;color:var(--muted);font-size:17px;line-height:1.4}
 .err{color:var(--rose-deep)}
 .note{font-size:12px;color:var(--muted);text-align:center;margin-top:14px}
-.row{display:flex;gap:10px}
+.group{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:4px 0 14px;text-align:center}
+.group + .modes, .modes + .group{margin-top:22px}
+.minis{display:flex;height:44px;align-items:flex-end}
+.minis i{width:24px;height:38px;border:1px solid var(--rose-deep);border-radius:4px;background:#f6ece6;margin:0 -4px}
+.minis i:nth-child(odd){transform:rotate(-8deg)} .minis i:nth-child(even){transform:rotate(8deg) translateY(-3px)}
+
+/* tarot spread */
+.spread{display:grid;gap:10px;width:100%}
+.tc{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0}
+.tc small{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);text-align:center;line-height:1.3;min-height:2.6em;display:flex;align-items:flex-end}
+.face{width:100%;aspect-ratio:2/3.2;border:1px solid var(--line);border-radius:8px;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:6px;
+  transition:transform .5s ease,background .3s}
+.face b{font-family:var(--serif);font-weight:500;font-size:24px;color:var(--rose-deep);line-height:1}
+.face span{font-family:var(--serif);font-size:13px;line-height:1.15;text-align:center}
+.tc.rev .face{background:#fbf3f0;border-color:var(--rose)}
+.tc small:empty{display:none}
+.tc em{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--rose-deep);font-style:normal;min-height:1.2em}
+.tc.back .face{transform:rotateY(180deg);background:repeating-linear-gradient(45deg,#f6ece6 0 6px,#efe0d8 6px 12px);border-color:var(--rose)}
+.tc.back .face *, .tc.back em{visibility:hidden}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -117,6 +135,7 @@ textarea::placeholder{color:#b9aea4}
   <section class="screen" id="s-mode" aria-labelledby="t-mode">
     <div class="top"><button class="back" data-go="start">&larr; Back</button></div>
     <h2 id="t-mode">Choose a mode</h2>
+    <p class="group">I Ching</p>
     <div class="modes">
       <button class="mode lace" data-mode="yesno">
         <span class="zh" aria-hidden="true">小六爻</span><b>Yes / No</b><small>A quick, clear answer when you're stuck</small>
@@ -124,9 +143,15 @@ textarea::placeholder{color:#b9aea4}
       <button class="mode lace" data-mode="guidance">
         <span class="zh" aria-hidden="true">六爻</span><b>Guidance</b><small>Short advice from your hexagram</small>
       </button>
-      <div class="mode lace wide" aria-disabled="true">
-        <b>Tarot</b><small>A card-based reading</small><span class="tag">Coming soon</span>
-      </div>
+    </div>
+    <p class="group">Tarot</p>
+    <div class="modes">
+      <button class="mode lace" data-mode="tarot-yesno">
+        <span class="minis" aria-hidden="true"><i></i><i></i><i></i></span><b>Yes / No</b><small>Three cards, counted upright or reversed</small>
+      </button>
+      <button class="mode lace" data-mode="tarot-guidance">
+        <span class="minis" aria-hidden="true"><i></i><i></i><i></i><i></i></span><b>Guidance</b><small>Four cards, straight to the core</small>
+      </button>
     </div>
   </section>
 
@@ -151,6 +176,7 @@ textarea::placeholder{color:#b9aea4}
       <p class="yourq" id="r-q"></p>
       <div class="hex" id="r-hex" hidden></div>
       <div class="palace" id="r-palace" hidden></div>
+      <div class="spread" id="r-cards" hidden></div>
       <p class="castname" id="r-name">Casting&hellip;</p>
       <div class="reading" id="r-reading"></div>
     </div>
@@ -176,8 +202,9 @@ document.addEventListener('click', (e) => {
   const m = e.target.closest('[data-mode]');
   if (m) {
     state.mode = m.dataset.mode;
-    $('#qlabel').textContent = state.mode === 'yesno' ? 'Ask something with a yes or no answer' : "Ask it the way you'd ask a friend";
-    $('#q').placeholder = state.mode === 'yesno' ? 'Will they reach out this week?' : 'What should I focus on with my career right now?';
+    const yn = state.mode.endsWith('yesno');
+    $('#qlabel').textContent = yn ? 'Ask something with a yes or no answer' : "Ask it the way you'd ask a friend";
+    $('#q').placeholder = yn ? 'Will they reach out this week?' : 'What should I focus on with my career right now?';
     go('ask');
   }
 });
@@ -194,13 +221,18 @@ $('#ask').addEventListener('submit', async (e) => {
   e.preventDefault();
   const question = $('#q').value.trim();
   if (!question) return;
-  const yesno = state.mode === 'yesno';
-  const hex = $('#r-hex'), palace = $('#r-palace'), reading = $('#r-reading');
+  const yesno = state.mode === 'yesno', tarot = state.mode.startsWith('tarot');
+  const hex = $('#r-hex'), palace = $('#r-palace'), cards = $('#r-cards'), reading = $('#r-reading');
   $('#r-q').textContent = '“' + question + '”';
-  $('#r-name').textContent = 'Casting…';
+  $('#r-name').textContent = tarot ? 'Shuffling…' : 'Casting…';
   reading.className = 'reading'; reading.innerHTML = '';
-  hex.hidden = yesno; palace.hidden = !yesno;
-  if (!yesno) drawHex(hex, Array(6).fill(0), true);
+  hex.hidden = yesno || tarot; palace.hidden = !yesno; cards.hidden = !tarot;
+  if (!yesno && !tarot) drawHex(hex, Array(6).fill(0), true);
+  if (tarot) {
+    const n = state.mode === 'tarot-yesno' ? 3 : 4;
+    cards.style.gridTemplateColumns = `repeat(${n}, 1fr)`;
+    cards.innerHTML = Array(n).fill('<div class="tc back"><small></small><div class="face"><b></b><span></span></div><em></em></div>').join('');
+  }
   go('result');
 
   let spin;
@@ -217,7 +249,7 @@ $('#ask').addEventListener('submit', async (e) => {
     if (!res.ok) throw new Error(data.error);
   } catch (err) {
     clearInterval(spin);
-    palace.hidden = hex.hidden = true;
+    palace.hidden = hex.hidden = cards.hidden = true;
     $('#r-name').textContent = '';
     reading.innerHTML = `<p class="err">${esc(err.message || 'The oracle is quiet right now. Try again in a moment.')}</p>`;
     reading.className = 'reading on';
@@ -229,6 +261,19 @@ $('#ask').addEventListener('submit', async (e) => {
     clearInterval(spin);
     palace.textContent = cast.zh;
     $('#r-name').innerHTML = `${esc(cast.en)} · ${esc(cast.hourName)}<br><span class="verdict">${esc(cast.verdict)}</span>`;
+  } else if (tarot) {
+    // turn the cards over one by one
+    const els = cards.querySelectorAll('.tc');
+    for (const [i, c] of cast.cards.entries()) {
+      const el = els[i];
+      el.querySelector('small').textContent = state.mode === 'tarot-yesno' ? '' : c.position;
+      el.querySelector('b').textContent = c.glyph;
+      el.querySelector('span').textContent = c.name;
+      el.querySelector('em').textContent = c.reversed ? 'Reversed' : '';
+      el.className = 'tc' + (c.reversed ? ' rev' : '');
+      if (!reduced) await sleep(260);
+    }
+    $('#r-name').innerHTML = cast.verdict ? `<span class="verdict">${esc(cast.verdict)}</span>` : '';
   } else {
     // reveal lines bottom to top, like six tosses
     const rows = hex.querySelectorAll('.ln');

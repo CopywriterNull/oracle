@@ -1,4 +1,5 @@
 import { castHexagram, lunarMoment, xiaoLiuyao, SYSTEM_PROMPT, userPrompt, parseReading } from '../lib/oracle.js';
+import { draw, tarotVerdict } from '../lib/tarot.js';
 
 const MODEL = 'anthropic/claude-sonnet-5.5';
 const LIMIT = 20; // readings per IP per hour
@@ -26,7 +27,7 @@ export async function POST(request) {
     return json({ error: 'Bad request' }, 400);
   }
   const question = String(body.question || '').trim().slice(0, 300);
-  const mode = body.mode === 'yesno' ? 'yesno' : 'guidance';
+  const mode = ['yesno', 'guidance', 'tarot-yesno', 'tarot-guidance'].includes(body.mode) ? body.mode : 'guidance';
   if (!question) return json({ error: 'Ask a question first.' }, 400);
 
   let timeZone = 'UTC';
@@ -36,7 +37,13 @@ export async function POST(request) {
   } catch {}
 
   const moment = lunarMoment(new Date(), timeZone);
-  const cast = mode === 'yesno' ? { ...xiaoLiuyao(moment), hourName: moment.hourName } : castHexagram();
+  let cast;
+  if (mode === 'yesno') cast = { ...xiaoLiuyao(moment), hourName: moment.hourName };
+  else if (mode === 'guidance') cast = castHexagram();
+  else {
+    const cards = draw(mode);
+    cast = { cards, verdict: mode === 'tarot-yesno' ? tarotVerdict(cards) : undefined };
+  }
 
   const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
     method: 'POST',

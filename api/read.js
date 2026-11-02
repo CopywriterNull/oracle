@@ -1,7 +1,9 @@
 import { castHexagram, lunarMoment, xiaoLiuyao, SYSTEM_PROMPT, userPrompt, parseReading } from '../lib/oracle.js';
 import { draw, tarotVerdict } from '../lib/tarot.js';
+import Anthropic from '@anthropic-ai/sdk';
 
-const MODEL = 'anthropic/claude-sonnet-5.5';
+const MODEL = 'claude-sonnet-5-5';
+const client = new Anthropic(); // reads ANTHROPIC_API_KEY
 const LIMIT = 20; // readings per IP per hour
 
 // shortcut: in-memory, per function instance, so it resets on cold start. Move to Upstash/KV if the link goes wide.
@@ -45,23 +47,24 @@ export async function POST(request) {
     cast = { cards, verdict: mode === 'tarot-yesno' ? tarotVerdict(cards) : undefined };
   }
 
-  const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({
+  const askedAt = new Date().toLocaleString('en-US', { timeZone, weekday: 'long', hour: 'numeric', minute: '2-digit' });
+  let text;
+  try {
+    const res = await client.beta.messages.create({
       model: MODEL,
-      max_tokens: 800,
-      messages: [
-        { role: 'system', content: SYSTEM_PROMPT },
-        { role: 'user', content: userPrompt(mode, cast, question, new Date().toLocaleString('en-US', { timeZone, weekday: 'long', hour: 'numeric', minute: '2-digit' })) },
-      ],
-    }),
-  });
-  const data = await res.json().catch(() => ({}));
-  const text = data.choices?.[0]?.message?.content;
-  if (!res.ok || !text) {
-    console.error('openrouter', res.status, JSON.stringify(data).slice(0, 500));
-    return json({ error: 'The oracle is quiet right now. Try again in a moment.' }, 502);
+      max_tokens: 4000,
+      output_config: { effort: 'low' },
+      // on a safety decline, the API retries on a fallback model inside the same call
+      betas: ['server-side-fallback-2026-07-01'],
+      fallbacks: 'default',
+      system: SYSTEM_PROMPT,
+      messages: [{ role: 'user', content: userPrompt(mode, cast, question, askedAt) }],
+    });
+    if (res.stop_reason !== 'refusal') text = res.content.filter((b) => b.type === 'text').map((b) => b.text).join('');
+    if (!text) console.error('anthropic', res.stop_reason, JSON.stringify(res.stop_details));
+  } catch (err) {
+    console.error('anthropic', err.status, err.message);
   }
+  if (!text) return json({ error: 'The oracle is quiet right now. Try again in a moment.' }, 502);
   return json({ mode, cast, reading: parseReading(text) });
 }

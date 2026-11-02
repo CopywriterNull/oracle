@@ -2,5 +2,10 @@
   "name": "oracle",
   "private": true,
   "type": "module",
-  "scripts": { "test": "node lib/oracle.test.js" }
+  "scripts": {
+    "test": "node lib/oracle.test.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.3.0"
+  }
 }

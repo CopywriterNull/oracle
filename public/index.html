@@ -5,30 +5,38 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Oracle</title>
 <meta name="description" content="Find your quiet sign. Discover soft, AI‑powered guidance from Liu‑Yao — ancient Chinese I‑Ching divination — and Tarot. When you feel unsure amid choices, get a small nudge to move forward.">
-<meta name="theme-color" content="#f8f3ec">
+<meta name="theme-color" content="#1d2347">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500&family=Noto+Serif+SC:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Jost:wght@300;400;500&family=Noto+Serif+SC:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{
-  --paper:#f8f3ec; --card:#fffdf9; --ink:#3a332e; --muted:#8a7f76; --line:#d9cbbd;
-  --rose:#e9c9c3; --rose-deep:#b06f72; --sage:#cfdfc9; --sage-deep:#6f8a68;
-  --serif:'Cormorant Garamond',Georgia,serif; --sans:'Jost',system-ui,sans-serif; --zh:'Noto Serif SC',serif;
+  /* Midnight Lace: navy starry sky, cream lace cards, gold */
+  --night:#1d2347; --page-ink:#f4ecdc; --page-muted:#b9b3d6;
+  --card:#fbf6ec; --ink:#2b2740; --muted:#857e9c; --line:#d8c9a8;
+  --rose:#f2d8a7; --rose-deep:#a8822f; --sage:#f2d8a7; --sage-deep:#a8822f; --soft:#f3ead6;
+  --serif:'Instrument Serif',Georgia,serif; --sans:'Jost',system-ui,sans-serif; --zh:'Noto Serif SC',serif;
 }
 *{box-sizing:border-box;margin:0}
-body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-weight:300;-webkit-font-smoothing:antialiased;
-  background-image:radial-gradient(circle at 20% 0%,#f3e4dc 0,transparent 45%),radial-gradient(circle at 100% 100%,#e8efe2 0,transparent 40%)}
+body{background:linear-gradient(#1d2347,#2d2f5e 60%,#4a3f6b) fixed var(--night);color:var(--page-ink);font-family:var(--sans);font-weight:300;-webkit-font-smoothing:antialiased;min-height:100dvh}
+.sky{position:fixed;inset:0;pointer-events:none;z-index:0}
+.sky i{position:absolute;display:block;color:#f2d8a7;animation:twinkle 3.2s ease-in-out infinite}
+.sky i.dot{border-radius:50%;background:#f4ecdc}
+.sky svg{width:100%;height:100%;fill:currentColor;display:block}
+@keyframes twinkle{50%{opacity:.35}}
+main{position:relative;z-index:1}
+.lace{color:var(--ink)}
 main{max-width:440px;margin:0 auto;min-height:100dvh;padding:20px 20px calc(24px + env(safe-area-inset-bottom));display:flex;flex-direction:column}
 .screen{display:none;flex:1;flex-direction:column;animation:fade .45s ease both}
 .screen.on{display:flex}
 @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 .top{height:40px;display:flex;align-items:center}
-.back{background:none;border:0;color:var(--muted);font:inherit;font-size:15px;padding:8px 8px 8px 0;cursor:pointer}
+.back{background:none;border:0;color:var(--page-muted);font:inherit;font-size:15px;padding:8px 8px 8px 0;cursor:pointer}
 .back:focus-visible,.btn:focus-visible,.mode:focus-visible,textarea:focus-visible{outline:2px solid var(--rose-deep);outline-offset:3px}
-h1,h2{font-family:var(--serif);font-weight:500;letter-spacing:.01em;text-align:center}
-h1{font-size:56px;line-height:1}
+h1,h2{font-family:var(--serif);font-weight:400;letter-spacing:.01em;text-align:center}
+h1{font-size:68px;line-height:1}
 h2{font-size:34px;margin:8px 0 24px}
-.sub{text-align:center;color:var(--muted);font-family:var(--serif);font-style:italic;font-size:20px;margin-top:6px}
+.sub{text-align:center;color:var(--page-muted);font-family:var(--serif);font-style:italic;font-size:20px;margin-top:6px}
 
 /* lace card */
 .lace{position:relative;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:28px 22px;
@@ -39,10 +47,14 @@ h2{font-size:34px;margin:8px 0 24px}
 .lace::after{content:"";position:absolute;left:18px;right:18px;top:-6px;height:12px;
   background:radial-gradient(circle at 6px 6px,var(--card) 4.5px,var(--line) 5px,transparent 5.5px) 0 0/12px 12px repeat-x;pointer-events:none}
 
-.kicker{text-align:center;font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
-.intro{text-align:center;color:var(--muted);font-size:15px;line-height:1.55;max-width:320px;margin:14px auto 0}
+.kicker{text-align:center;font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--page-muted);margin-bottom:12px}
+.intro{text-align:center;color:var(--page-muted);font-size:15px;line-height:1.55;max-width:320px;margin:14px auto 0}
 .hero{flex:1;display:flex;flex-direction:column;justify-content:center;gap:34px;padding:10px 0}
-.hero .lace{margin:0 auto;width:min(240px,70vw);aspect-ratio:3/4.2;display:grid;place-items:center}
+.fan{position:relative;height:220px;display:grid;place-items:center}
+.fan i{position:absolute;width:118px;height:178px;border-radius:10px;border:3px solid var(--card);box-shadow:0 14px 30px -14px #000;
+  background:radial-gradient(#f2d8a7 16%,transparent 17%) 0 0/14px 14px,radial-gradient(#f2d8a7 16%,transparent 17%) 7px 7px/14px 14px,#2d2f5e;display:grid;place-items:center}
+.fan i:nth-child(1){transform:rotate(-14deg) translate(-38px,8px)} .fan i:nth-child(2){transform:rotate(14deg) translate(38px,8px)}
+.fan i:nth-child(3) svg{width:30px;fill:var(--card)}
 
 /* hexagram lines */
 .hex{display:flex;flex-direction:column-reverse;gap:10px;width:120px}
@@ -58,20 +70,20 @@ h2{font-size:34px;margin:8px 0 24px}
 @keyframes shimmer{50%{opacity:.35}}
 .hero .hex .ln i{background:var(--rose-deep);opacity:.75}
 
-.btn{display:block;width:100%;border:1px solid rgba(58,51,46,.18);border-radius:999px;padding:16px;font:inherit;font-size:17px;font-weight:400;letter-spacing:.06em;
-  color:var(--ink);background:var(--rose);cursor:pointer;transition:transform .15s,box-shadow .15s;box-shadow:0 8px 20px -14px rgba(176,111,114,.9)}
+.btn{display:block;width:100%;border:0;border-radius:999px;padding:16px;font:inherit;font-size:17px;font-weight:400;letter-spacing:.06em;
+  color:var(--ink);background:var(--rose);cursor:pointer;transition:transform .15s,box-shadow .15s;box-shadow:0 10px 24px -12px rgba(0,0,0,.6)}
 .btn:active{transform:scale(.98)}
-.btn.sage{background:var(--sage);box-shadow:0 8px 20px -14px rgba(111,138,104,.9)}
+.btn.sage{background:var(--sage)}
 .btn:disabled{opacity:.5;cursor:default}
 .foot{margin-top:auto;padding-top:20px}
 
 /* modes */
 .modes{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 [hidden]{display:none!important}
-.mode{font:inherit;color:inherit;cursor:pointer;text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px;padding:26px 14px 22px;transition:transform .15s}
+.mode{font:inherit;color:var(--ink);cursor:pointer;text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px;padding:26px 14px 22px;transition:transform .15s}
 .mode:active{transform:scale(.98)}
 .mode .zh{font-family:var(--zh);font-size:30px;color:var(--rose-deep)}
-.mode b{font-family:var(--serif);font-weight:600;font-size:22px}
+.mode b{font-family:var(--serif);font-weight:400;font-size:24px}
 .mode small{color:var(--muted);font-size:13px;line-height:1.35}
 .mode.wide{grid-column:1/-1}
 .mode[aria-disabled=true]{cursor:default;opacity:.55}
@@ -81,9 +93,9 @@ h2{font-size:34px;margin:8px 0 24px}
 .qcard{padding:22px}
 .qlabel{display:block;font-family:var(--serif);font-style:italic;font-size:18px;color:var(--muted);margin-bottom:10px}
 textarea{width:100%;min-height:150px;border:0;resize:none;background:transparent;font:inherit;font-size:18px;line-height:1.5;color:var(--ink)}
-textarea::placeholder{color:#b9aea4}
+textarea::placeholder{color:#aaa3bf}
 .count{text-align:right;font-size:12px;color:var(--muted)}
-.hint{color:var(--muted);font-size:14px;line-height:1.5;text-align:center;margin-top:18px;padding:0 10px}
+.hint{color:var(--page-muted);font-size:14px;line-height:1.5;text-align:center;margin-top:18px;padding:0 10px}
 
 /* result */
 .result{text-align:center;display:flex;flex-direction:column;align-items:center;gap:16px;padding:30px 22px 26px}
@@ -91,17 +103,17 @@ textarea::placeholder{color:#b9aea4}
 .verdict{font-family:var(--serif);font-size:18px;font-style:italic}
 .reading{opacity:0;transition:opacity .6s ease;display:flex;flex-direction:column;gap:14px}
 .reading.on{opacity:1}
-.reading h3{font-family:var(--serif);font-weight:500;font-size:28px;line-height:1.15}
+.reading h3{font-family:var(--serif);font-weight:400;font-size:30px;line-height:1.15}
 .reading p{font-size:16.5px;line-height:1.65;text-align:left}
-.step{background:#f6ece6;border-radius:10px;padding:12px 14px;font-size:15px;line-height:1.5;text-align:left}
+.step{background:var(--soft);border-radius:10px;padding:12px 14px;font-size:15px;line-height:1.5;text-align:left}
 .step span{display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--rose-deep);margin-bottom:4px}
 .yourq{font-family:var(--serif);font-style:italic;color:var(--muted);font-size:17px;line-height:1.4}
 .err{color:var(--rose-deep)}
-.note{font-size:12px;color:var(--muted);text-align:center;margin-top:14px}
-.group{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:4px 0 14px;text-align:center}
+.note{font-size:12px;color:var(--page-muted);text-align:center;margin-top:14px}
+.group{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--page-muted);margin:4px 0 14px;text-align:center}
 .group + .modes, .modes + .group{margin-top:22px}
 .minis{display:flex;height:44px;align-items:flex-end}
-.minis i{width:24px;height:38px;border:1px solid var(--rose-deep);border-radius:4px;background:#f6ece6;margin:0 -4px}
+.minis i{width:24px;height:38px;border:2px solid var(--card);border-radius:4px;background:radial-gradient(#f2d8a7 18%,transparent 19%) 0 0/7px 7px,#2d2f5e;margin:0 -4px}
 .minis i:nth-child(odd){transform:rotate(-8deg)} .minis i:nth-child(even){transform:rotate(8deg) translateY(-3px)}
 
 /* tarot spread */
@@ -110,17 +122,18 @@ textarea::placeholder{color:#b9aea4}
 .tc small{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);text-align:center;line-height:1.3;min-height:2.6em;display:flex;align-items:flex-end}
 .face{width:100%;aspect-ratio:2/3.2;border:1px solid var(--line);border-radius:8px;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:6px;
   transition:transform .5s ease,background .3s}
-.face b{font-family:var(--serif);font-weight:500;font-size:24px;color:var(--rose-deep);line-height:1}
+.face b{font-family:var(--serif);font-weight:400;font-size:24px;color:var(--rose-deep);line-height:1}
 .face span{font-family:var(--serif);font-size:13px;line-height:1.15;text-align:center}
-.tc.rev .face{background:#fbf3f0;border-color:var(--rose)}
+.tc.rev .face{background:var(--soft);border-color:var(--rose-deep)}
 .tc small:empty{display:none}
 .tc em{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--rose-deep);font-style:normal;min-height:1.2em}
-.tc.back .face{transform:rotateY(180deg);background:repeating-linear-gradient(45deg,#f6ece6 0 6px,#efe0d8 6px 12px);border-color:var(--rose)}
+.tc.back .face{transform:rotateY(180deg);background:radial-gradient(#f2d8a7 16%,transparent 17%) 0 0/12px 12px,radial-gradient(#f2d8a7 16%,transparent 17%) 6px 6px/12px 12px,#2d2f5e;border:3px solid var(--card)}
 .tc.back .face *, .tc.back em{visibility:hidden}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
+<div class="sky" aria-hidden="true"></div>
 <main>
   <!-- 1. start -->
   <section class="screen on" id="s-start" aria-labelledby="t-start">
@@ -131,7 +144,7 @@ textarea::placeholder{color:#b9aea4}
         <p class="sub">Find your quiet sign</p>
         <p class="intro">Discover soft, AI‑powered guidance from Liu‑Yao — ancient Chinese I‑Ching divination — and Tarot. When you feel unsure amid choices, get a small nudge to move forward.</p>
       </div>
-      <div class="lace" aria-hidden="true"><div class="hex" id="hero-hex"></div></div>
+      <div class="fan" aria-hidden="true"><i></i><i></i><i><svg viewBox="0 0 20 20"><path d="M10 0C11 7 13 9 20 10 13 11 11 13 10 20 9 13 7 11 0 10 7 9 9 7 10 0Z"/></svg></i></div>
     </div>
     <div class="foot"><button class="btn sage" data-go="mode">Start</button></div>
   </section>
@@ -215,7 +228,16 @@ document.addEventListener('click', (e) => {
 function drawHex(el, lines, wait) {
   el.innerHTML = lines.map((l) => `<div class="ln ${wait ? 'wait' : l ? 'yang' : 'yin'}"><i></i><i></i></div>`).join('');
 }
-drawHex($('#hero-hex'), [1, 0, 0, 0, 1, 1]);
+// starry sky: fixed layer of sparkles and dots, same layout every load
+(() => {
+  let seed = 7; const r = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+  const spark = '<svg viewBox="0 0 20 20"><path d="M10 0C11 7 13 9 20 10 13 11 11 13 10 20 9 13 7 11 0 10 7 9 9 7 10 0Z"/></svg>';
+  $('.sky').innerHTML = Array.from({ length: 46 }, () => {
+    const big = r() < .22, size = big ? [7, 9, 12, 15][Math.floor(r() * 4)] : 2 + r() * 1.5;
+    const pos = `left:${(r() * 98).toFixed(1)}%;top:${(r() * 98).toFixed(1)}%;width:${size}px;height:${size}px;animation-delay:${(r() * 3).toFixed(1)}s`;
+    return big ? `<i style="${pos}">${spark}</i>` : `<i class="dot" style="${pos};opacity:${(.4 + r() * .5).toFixed(2)}"></i>`;
+  }).join('');
+})();
 
 $('#q').addEventListener('input', (e) => ($('#n').textContent = e.target.value.length));
 $('#q').addEventListener('keydown', (e) => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) $('#ask').requestSubmit(); });

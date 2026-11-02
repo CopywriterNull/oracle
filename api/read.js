@@ -1,4 +1,4 @@
-import { castHexagram, lunarMoment, xiaoLiuyao, SYSTEM_PROMPT, userPrompt, parseReading } from '../lib/oracle.js';
+import { castHexagram, lunarMoment, quickLiuyao, SYSTEM_PROMPT, userPrompt, parseReading } from '../lib/oracle.js';
 import { draw, tarotVerdict } from '../lib/tarot.js';
 import Anthropic from '@anthropic-ai/sdk';
 
@@ -40,7 +40,7 @@ export async function POST(request) {
 
   const moment = lunarMoment(new Date(), timeZone);
   let cast;
-  if (mode === 'yesno') cast = { ...xiaoLiuyao(moment), hourName: moment.hourName };
+  if (mode === 'yesno') cast = { ...quickLiuyao(moment), time: `${moment.yearName} ${moment.month}月${moment.day}日 ${moment.hourName} ${moment.clock}` };
   else if (mode === 'guidance') cast = castHexagram();
   else {
     const cards = draw(mode);

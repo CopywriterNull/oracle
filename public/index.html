@@ -51,6 +51,8 @@ h2{font-size:34px;margin:8px 0 24px}
 .ln i+i{margin-left:0}
 .ln.yin i:first-child{flex:.44} .ln.yin i:last-child{flex:.44}
 .ln.yin{gap:12%}
+.ln.moving i{background:var(--rose-deep)}
+.castname small{display:block;font-family:var(--sans);font-size:13px;letter-spacing:.02em;text-transform:none;color:var(--muted);margin-top:6px;line-height:1.5}
 .ln.wait i{background:var(--line);animation:shimmer 1.2s ease-in-out infinite}
 .ln.wait i:last-child{display:none}
 @keyframes shimmer{50%{opacity:.35}}
@@ -86,7 +88,6 @@ textarea::placeholder{color:#b9aea4}
 /* result */
 .result{text-align:center;display:flex;flex-direction:column;align-items:center;gap:16px;padding:30px 22px 26px}
 .castname{font-family:var(--serif);font-size:15px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);min-height:1.2em}
-.palace{font-family:var(--zh);font-size:54px;line-height:1.1;color:var(--rose-deep);min-height:60px;transition:opacity .2s}
 .verdict{font-family:var(--serif);font-size:18px;font-style:italic}
 .reading{opacity:0;transition:opacity .6s ease;display:flex;flex-direction:column;gap:14px}
 .reading.on{opacity:1}
@@ -179,7 +180,6 @@ textarea::placeholder{color:#b9aea4}
     <div class="lace result" aria-live="polite">
       <p class="yourq" id="r-q"></p>
       <div class="hex" id="r-hex" hidden></div>
-      <div class="palace" id="r-palace" hidden></div>
       <div class="spread" id="r-cards" hidden></div>
       <p class="castname" id="r-name">Casting&hellip;</p>
       <div class="reading" id="r-reading"></div>
@@ -191,7 +191,6 @@ textarea::placeholder{color:#b9aea4}
 
 <script>
 const $ = (s) => document.querySelector(s);
-const PALACES = ['大安','留连','速喜','赤口','小吉','空亡'];
 const state = { mode: 'guidance' };
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -226,21 +225,18 @@ $('#ask').addEventListener('submit', async (e) => {
   const question = $('#q').value.trim();
   if (!question) return;
   const yesno = state.mode === 'yesno', tarot = state.mode.startsWith('tarot');
-  const hex = $('#r-hex'), palace = $('#r-palace'), cards = $('#r-cards'), reading = $('#r-reading');
+  const hex = $('#r-hex'), cards = $('#r-cards'), reading = $('#r-reading');
   $('#r-q').textContent = '“' + question + '”';
   $('#r-name').textContent = tarot ? 'Shuffling…' : 'Casting…';
   reading.className = 'reading'; reading.innerHTML = '';
-  hex.hidden = yesno || tarot; palace.hidden = !yesno; cards.hidden = !tarot;
-  if (!yesno && !tarot) drawHex(hex, Array(6).fill(0), true);
+  hex.hidden = tarot; cards.hidden = !tarot;
+  if (!tarot) drawHex(hex, Array(6).fill(0), true);
   if (tarot) {
     const n = state.mode === 'tarot-yesno' ? 3 : 4;
     cards.style.gridTemplateColumns = `repeat(${n}, 1fr)`;
     cards.innerHTML = Array(n).fill('<div class="tc back"><small></small><div class="face"><b></b><span></span></div><em></em></div>').join('');
   }
   go('result');
-
-  let spin;
-  if (yesno) { let i = 0; spin = setInterval(() => (palace.textContent = PALACES[i++ % 6]), 140); }
 
   let data;
   try {
@@ -252,8 +248,7 @@ $('#ask').addEventListener('submit', async (e) => {
     data = await res.json();
     if (!res.ok) throw new Error(data.error);
   } catch (err) {
-    clearInterval(spin);
-    palace.hidden = hex.hidden = cards.hidden = true;
+    hex.hidden = cards.hidden = true;
     $('#r-name').textContent = '';
     reading.innerHTML = `<p class="err">${esc(err.message || 'The oracle is quiet right now. Try again in a moment.')}</p>`;
     reading.className = 'reading on';
@@ -261,11 +256,7 @@ $('#ask').addEventListener('submit', async (e) => {
   }
 
   const { cast, reading: r } = data;
-  if (yesno) {
-    clearInterval(spin);
-    palace.textContent = cast.zh;
-    $('#r-name').innerHTML = `${esc(cast.en)} · ${esc(cast.hourName)}<br><span class="verdict">${esc(cast.verdict)}</span>`;
-  } else if (tarot) {
+  if (tarot) {
     // turn the cards over one by one
     const els = cards.querySelectorAll('.tc');
     for (const [i, c] of cast.cards.entries()) {
@@ -283,6 +274,10 @@ $('#ask').addEventListener('submit', async (e) => {
     const rows = hex.querySelectorAll('.ln');
     for (let i = 0; i < 6; i++) { rows[i].className = 'ln ' + (cast.lines[i] ? 'yang' : 'yin'); if (!reduced) await sleep(170); }
     $('#r-name').textContent = `${cast.n} · ${cast.name}`;
+    if (yesno) {
+      rows[cast.moving - 1].classList.add('moving');
+      $('#r-name').innerHTML += `<small>Line ${cast.moving} moves → ${cast.changed.n} · ${esc(cast.changed.name)}<br>${esc(cast.time)}</small>`;
+    }
   }
   reading.innerHTML = `<h3>${esc(r.title)}</h3>${r.body ? `<p>${esc(r.body)}</p>` : ''}` +
     (r.step ? `<div class="step"><span>Small step</span>${esc(r.step)}</div>` : '');

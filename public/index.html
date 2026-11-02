@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Oracle</title>
-<meta name="description" content="Find your answer. A quiet I Ching reading for the questions you already half know.">
+<meta name="description" content="Find your quiet sign. Discover soft, AI‑powered guidance from Liu‑Yao — ancient Chinese I‑Ching divination — and Tarot. When you feel unsure amid choices, get a small nudge to move forward.">
 <meta name="theme-color" content="#f8f3ec">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -39,6 +39,8 @@ h2{font-size:34px;margin:8px 0 24px}
 .lace::after{content:"";position:absolute;left:18px;right:18px;top:-6px;height:12px;
   background:radial-gradient(circle at 6px 6px,var(--card) 4.5px,var(--line) 5px,transparent 5.5px) 0 0/12px 12px repeat-x;pointer-events:none}
 
+.kicker{text-align:center;font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+.intro{text-align:center;color:var(--muted);font-size:15px;line-height:1.55;max-width:320px;margin:14px auto 0}
 .hero{flex:1;display:flex;flex-direction:column;justify-content:center;gap:34px;padding:10px 0}
 .hero .lace{margin:0 auto;width:min(240px,70vw);aspect-ratio:3/4.2;display:grid;place-items:center}
 
@@ -123,8 +125,10 @@ textarea::placeholder{color:#b9aea4}
   <section class="screen on" id="s-start" aria-labelledby="t-start">
     <div class="hero">
       <div>
+        <p class="kicker">Find your answer</p>
         <h1 id="t-start">Oracle</h1>
-        <p class="sub">find your answer</p>
+        <p class="sub">Find your quiet sign</p>
+        <p class="intro">Discover soft, AI‑powered guidance from Liu‑Yao — ancient Chinese I‑Ching divination — and Tarot. When you feel unsure amid choices, get a small nudge to move forward.</p>
       </div>
       <div class="lace" aria-hidden="true"><div class="hex" id="hero-hex"></div></div>
     </div>

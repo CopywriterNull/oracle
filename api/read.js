@@ -43,7 +43,7 @@ export async function POST(request) {
     headers: { Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({
       model: MODEL,
-      max_tokens: 350,
+      max_tokens: 800,
       messages: [
         { role: 'system', content: SYSTEM_PROMPT },
         { role: 'user', content: userPrompt(mode, cast, question, new Date().toLocaleString('en-US', { timeZone, weekday: 'long', hour: 'numeric', minute: '2-digit' })) },

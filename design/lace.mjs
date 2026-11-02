@@ -12,6 +12,10 @@ const jobs = [
   ['doily', 'doily.png', 'lace', [255, 251, 242], { crop: 'box', width: 480 }],
   ['bow', 'bow.png', 'solid', null, { crop: 'box', width: 240 }],
   ['fabric', 'fabric.png', 'lace', [255, 255, 255], { width: 240, mirrorX: true, mirrorY: true }],
+  ['frame', 'frame.png', 'lace', [255, 251, 242], { crop: 'box', width: 420 }],
+  ['lily', 'lily.png', 'lace', [255, 251, 242], { crop: 'box', width: 420 }],
+  ['heart', 'heart.png', 'lace', [255, 251, 242], { crop: 'box', width: 320 }],
+  ['swirl', 'swirl.png', 'copy', null, { width: 360, mirrorX: true, mirrorY: true }],
 ];
 for (const [name, file, mode, tint, o] of jobs) {
   const data = 'data:image/png;base64,' + readFileSync(src + file).toString('base64');
@@ -25,7 +29,7 @@ for (const [name, file, mode, tint, o] of jobs) {
       if (mode === 'lace') { // thread brightness becomes opacity; colour is the tint
         const a = Math.pow(Math.min(1, Math.max(0, (lum - (o.black ?? 34)) / (200 - (o.black ?? 34)))), o.gamma ?? 0.85);
         px[i] = tint[0]; px[i + 1] = tint[1]; px[i + 2] = tint[2]; px[i + 3] = a * 255;
-      } else { px[i + 3] = Math.min(1, Math.max(0, (lum - 10) / 30)) * 255; } // solid object: keep its shading
+      } else if (mode === 'copy') { /* keep the image as is */ } else { px[i + 3] = Math.min(1, Math.max(0, (lum - 10) / 30)) * 255; } // solid object: keep its shading
     }
     x.putImageData(d, 0, 0);
     // crop to the lace

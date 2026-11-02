@@ -29,10 +29,11 @@ export async function POST(request) {
   } catch {
     return json({ error: 'Bad request' }, 400);
   }
-  const lang = body.lang === 'zh' ? 'zh' : 'en';
+  const question = String(body.question || '').trim().slice(0, 300);
+  // Chinese site, or a question typed in Chinese, gets the reading in Chinese
+  const lang = body.lang === 'zh' || /[\u4e00-\u9fff]/.test(question) ? 'zh' : 'en';
   const ip = (request.headers.get('x-forwarded-for') || 'local').split(',')[0].trim();
   if (limited(ip)) return json({ error: ERR[lang].rest }, 429);
-  const question = String(body.question || '').trim().slice(0, 300);
   const mode = ['yesno', 'guidance', 'tarot-yesno', 'tarot-guidance'].includes(body.mode) ? body.mode : 'guidance';
   if (!question) return json({ error: ERR[lang].ask }, 400);
 

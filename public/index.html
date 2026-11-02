@@ -129,6 +129,17 @@ textarea::placeholder{color:#aaa3bf}
 .tc em{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--rose-deep);font-style:normal;min-height:1.2em}
 .tc.back .face{transform:rotateY(180deg);background:radial-gradient(#f2d8a7 16%,transparent 17%) 0 0/12px 12px,radial-gradient(#f2d8a7 16%,transparent 17%) 6px 6px/12px 12px,#2d2f5e;border:3px solid var(--card)}
 .tc.back .face *, .tc.back em{visibility:hidden}
+/* daily ritual: one star per day asked, seven in a row make a constellation */
+.ritual{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;color:var(--page-muted);font-size:14px;line-height:1.45;margin-top:16px}
+.stars{display:flex;gap:9px}
+.stars svg{width:15px;height:15px;fill:rgba(242,216,167,.22);transition:fill .4s}
+.stars svg.lit{fill:#f2d8a7;filter:drop-shadow(0 0 5px rgba(242,216,167,.7))}
+.stars svg.new{animation:pop .9s ease .4s both}
+@keyframes pop{0%{transform:scale(.4);fill:rgba(242,216,167,.22)}60%{transform:scale(1.5)}100%{transform:scale(1)}}
+.prompt{display:block;width:100%;margin-top:14px;background:rgba(244,236,220,.08);border:1px dashed rgba(242,216,167,.45);border-radius:12px;padding:12px 14px;
+  font:inherit;font-size:15px;line-height:1.45;color:var(--page-ink);text-align:left;cursor:pointer}
+.prompt span{display:block;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--rose);margin-bottom:3px}
+.prompt:focus-visible{outline:2px solid var(--rose);outline-offset:3px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -145,6 +156,7 @@ textarea::placeholder{color:#aaa3bf}
         <p class="intro">Discover soft, AI‑powered guidance from Liu‑Yao — ancient Chinese I‑Ching divination — and Tarot. When you feel unsure amid choices, get a small nudge to move forward.</p>
       </div>
       <div class="fan" aria-hidden="true"><i></i><i></i><i><svg viewBox="0 0 20 20"><path d="M10 0C11 7 13 9 20 10 13 11 11 13 10 20 9 13 7 11 0 10 7 9 9 7 10 0Z"/></svg></i></div>
+      <div class="ritual" id="ritual-start"></div>
     </div>
     <div class="foot"><button class="btn sage" data-go="mode">Start</button></div>
   </section>
@@ -182,7 +194,8 @@ textarea::placeholder{color:#aaa3bf}
       <textarea id="q" maxlength="300" required placeholder="Should I text them first?"></textarea>
       <div class="count"><span id="n">0</span>/300</div>
     </form>
-    <p class="hint" id="hint">Hold the question in your mind for a breath, then send.</p>
+    <button type="button" class="prompt" id="prompt"><span>Today&rsquo;s prompt</span><b id="prompt-q"></b></button>
+    <p class="hint" id="hint">Questions for genuine reflection are recommended. Playful or nonsensical prompts may yield meaningless readings.</p>
     <div class="foot"><button class="btn" form="ask" type="submit">Send</button></div>
   </section>
 
@@ -197,6 +210,7 @@ textarea::placeholder{color:#aaa3bf}
       <p class="castname" id="r-name">Casting&hellip;</p>
       <div class="reading" id="r-reading"></div>
     </div>
+    <div class="ritual" id="ritual-result" aria-live="polite"></div>
     <div class="foot"><button class="btn" data-go="mode" id="again">Again</button></div>
     <p class="note">For reflection and fun. You already know more than you think.</p>
   </section>
@@ -221,6 +235,7 @@ document.addEventListener('click', (e) => {
     const yn = state.mode.endsWith('yesno');
     $('#qlabel').textContent = yn ? 'Ask something with a yes or no answer' : "Ask it the way you'd ask a friend";
     $('#q').placeholder = yn ? 'Will they reach out this week?' : 'What should I focus on with my career right now?';
+    $('#prompt-q').textContent = todays(yn ? PROMPTS.yesno : PROMPTS.guidance);
     go('ask');
   }
 });
@@ -239,6 +254,45 @@ function drawHex(el, lines, wait) {
   }).join('');
 })();
 
+// ---- daily ritual (per-browser, localStorage) ----
+const SPARK = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 0C11 7 13 9 20 10 13 11 11 13 10 20 9 13 7 11 0 10 7 9 9 7 10 0Z"/></svg>';
+const dayKey = (d = new Date()) => d.toLocaleDateString('en-CA'); // local YYYY-MM-DD
+const todays = (list) => list[Math.floor(new Date(dayKey()).getTime() / 864e5) % list.length];
+const PROMPTS = {
+  guidance: ['What am I ready to let go of?', 'Where should my energy go this week?', 'What is this relationship trying to teach me?',
+    'What am I avoiding that needs my attention?', 'How can I take better care of myself right now?', 'What would help me feel settled about my work?',
+    'What is the next step on the thing I keep putting off?'],
+  yesno: ['Is now a good time to start the project I keep thinking about?', 'Should I reach out to them this week?', 'Is this opportunity worth a yes?',
+    'Should I rest this weekend instead of making plans?', 'Is this the right time to ask for what I want at work?', 'Should I trust my first instinct on this?',
+    'Is it time to let this go?'],
+};
+function loadDays() { try { return JSON.parse(localStorage.getItem('oracle.days')) || []; } catch { return []; } }
+function sky() {
+  const days = new Set(loadDays()), d = new Date(), today = days.has(dayKey(d));
+  if (!today) d.setDate(d.getDate() - 1);
+  let streak = 0;
+  while (days.has(dayKey(d))) { streak++; d.setDate(d.getDate() - 1); }
+  return { today, streak, lit: today ? ((streak - 1) % 7) + 1 : streak % 7 };
+}
+function renderRitual(el, fresh) {
+  const { today, streak, lit } = sky();
+  const msg = today
+    ? lit === 7 ? 'Seven days in a row. Your constellation is complete, a new sky starts tomorrow.'
+      : fresh ? `Star ${lit} of 7 lit. Come back tomorrow to light the next one.`
+      : `Today's star is lit. Come back tomorrow for star ${lit + 1}.`
+    : streak ? (lit ? `${streak}-day streak. Ask today to light star ${lit + 1}.` : 'Constellation complete. Ask today to start a new one.')
+    : 'Ask once a day to light a star. Seven in a row make a constellation.';
+  el.innerHTML = `<div class="stars">${Array.from({ length: 7 }, (_, i) => SPARK.replace('<svg', `<svg class="${i < lit ? 'lit' : ''}${fresh && i === lit - 1 ? ' new' : ''}"`)).join('')}</div><p>${msg}</p>`;
+}
+function recordToday() {
+  const days = loadDays(), k = dayKey();
+  if (days.includes(k)) return false;
+  try { localStorage.setItem('oracle.days', JSON.stringify([...days, k].slice(-60))); return true; } catch { return false; }
+}
+renderRitual($('#ritual-start'));
+$('#prompt-q').textContent = todays(PROMPTS.guidance);
+$('#prompt').addEventListener('click', () => { const q = $('#q'); q.value = $('#prompt-q').textContent; $('#n').textContent = q.value.length; q.focus(); });
+
 $('#q').addEventListener('input', (e) => ($('#n').textContent = e.target.value.length));
 $('#q').addEventListener('keydown', (e) => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) $('#ask').requestSubmit(); });
 
@@ -250,7 +304,7 @@ $('#ask').addEventListener('submit', async (e) => {
   const hex = $('#r-hex'), cards = $('#r-cards'), reading = $('#r-reading');
   $('#r-q').textContent = '“' + question + '”';
   $('#r-name').textContent = tarot ? 'Shuffling…' : 'Casting…';
-  reading.className = 'reading'; reading.innerHTML = '';
+  reading.className = 'reading'; reading.innerHTML = ''; $('#ritual-result').innerHTML = '';
   hex.hidden = tarot; cards.hidden = !tarot;
   if (!tarot) drawHex(hex, Array(6).fill(0), true);
   if (tarot) {
@@ -304,6 +358,8 @@ $('#ask').addEventListener('submit', async (e) => {
   reading.innerHTML = `<h3>${esc(r.title)}</h3>${r.body ? `<p>${esc(r.body)}</p>` : ''}` +
     (r.step ? `<div class="step"><span>Small step</span>${esc(r.step)}</div>` : '');
   requestAnimationFrame(() => (reading.className = 'reading on'));
+  renderRitual($('#ritual-result'), recordToday());
+  renderRitual($('#ritual-start'));
   $('#q').value = ''; $('#n').textContent = '0';
 });
 

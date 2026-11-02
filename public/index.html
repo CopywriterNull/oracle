@@ -21,7 +21,7 @@
   --night:#1d2347; --page-ink:#f6efe0; --page-muted:#d3cee8;
   --card:#fbf6ec; --ink:#2b2740; --muted:#6f6888; --line:#d8c9a8; --soft:#f3ead6;
   --gold:#f2d8a7; --gold-deep:#a8822f;
-  --serif:'Instrument Serif',Georgia,serif; --sans:'Jost',system-ui,sans-serif; --zh:'Noto Serif SC',serif;
+  --serif:'Instrument Serif','Noto Serif SC',Georgia,serif; --sans:'Jost','Noto Serif SC',system-ui,sans-serif; --zh:'Noto Serif SC',serif;
   --spark:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M10 0C11 7 13 9 20 10 13 11 11 13 10 20 9 13 7 11 0 10 7 9 9 7 10 0Z'/%3E%3C/svg%3E");
 }
 /* card backs: one more unlocked per completed constellation */
@@ -120,8 +120,8 @@ h2{font-size:34px;line-height:1.1;margin:6px 0 18px}
 
 /* 1. start */
 .start{flex:1;display:flex;flex-direction:column;justify-content:center;gap:6px}
-.altar{position:relative;height:240px;display:grid;place-items:center;margin:4px 0}
-.doily{position:absolute;inset:0;margin:auto;width:236px;height:236px;animation:turn 240s linear infinite}
+.altar{position:relative;height:212px;display:grid;place-items:center;margin:4px 0}
+.doily{position:absolute;inset:0;margin:auto;width:212px;height:212px;animation:turn 240s linear infinite}
 @keyframes turn{to{rotate:360deg}}
 .daycard{position:relative;width:112px;height:176px;border-radius:10px;rotate:-5deg;box-shadow:0 16px 30px -12px #000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--gold-deep)}
 .daycard.faceup{background:var(--card);border:1px solid var(--line)}
@@ -249,19 +249,26 @@ button.star:hover svg{transform:scale(1.25)}
 .a2hs .btn{width:auto;padding:9px 14px;font-size:14px}
 .a2hs .x{background:none;border:0;color:var(--page-muted);font-size:22px;line-height:1;cursor:pointer;padding:4px}
 .note{font-size:12px;color:var(--page-muted);text-align:center;margin-top:16px}
+.lang{position:absolute;top:calc(18px + env(safe-area-inset-top));right:20px;z-index:2;background:rgba(246,239,224,.08);border:1px solid rgba(242,216,167,.45);border-radius:99px;padding:6px 14px;font-size:14px;cursor:pointer;color:var(--page-ink)}
+html[lang^=zh] *{font-style:normal!important}
+html[lang^=zh] .door .zh{display:none}
+html[lang^=zh] h1{font-size:46px}
+.start{padding-top:40px}
+html[lang^=zh] .kicker,html[lang^=zh] .today .lbl{letter-spacing:.2em}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
 <div class="sky" aria-hidden="true"><div class="layer"></div><div class="layer"></div><div class="layer"></div></div>
 <main>
+  <button class="lang" id="lang" aria-label="Switch language">中文</button>
   <!-- 1. start -->
   <section class="screen on" id="s-start" aria-labelledby="t-start">
     <div class="start">
       <header>
         <p class="kicker">Oracle</p>
-        <h1 id="t-start">Find your answer</h1>
-        <p class="sub">Find your quiet sign</p>
+        <h1 id="t-start" data-t="h1">Find your answer</h1>
+        <p class="sub" data-t="sub">Find your quiet sign</p>
       </header>
       <div class="altar" aria-hidden="true">
         <div class="doily"></div>
@@ -273,49 +280,49 @@ button.star:hover svg{transform:scale(1.25)}
       <div class="backs" id="backs" hidden></div>
     </div>
     <div class="foot">
-      <button class="btn" data-go="ask">Ask the oracle</button>
-      <details class="about"><summary>What is this?</summary>
-        <p>Discover soft, AI-powered guidance from Liu-Yao, ancient Chinese I Ching divination, and Tarot. When you feel unsure amid choices, get a small nudge to move forward.</p>
+      <button class="btn" data-go="ask" data-t="start">Ask the oracle</button>
+      <details class="about"><summary data-t="about">What is this?</summary>
+        <p data-t="aboutP">Discover soft, AI-powered guidance from Liu-Yao, ancient Chinese I Ching divination, and Tarot. When you feel unsure amid choices, get a small nudge to move forward.</p>
       </details>
     </div>
   </section>
 
   <!-- 2. question first -->
   <section class="screen" id="s-ask" aria-labelledby="t-ask">
-    <div class="top"><button class="back" data-go="start">&larr; Home</button></div>
-    <h2 id="t-ask">What&rsquo;s on your mind?</h2>
+    <div class="top"><button class="back" data-go="start" data-t="home">&larr; Home</button></div>
+    <h2 id="t-ask" data-t="askH">What&rsquo;s on your mind?</h2>
     <form id="ask">
       <label class="sr" for="q">Your question</label>
-      <textarea id="q" maxlength="300" rows="3" placeholder="Ask it the way you&rsquo;d ask a friend"></textarea>
+      <textarea id="q" maxlength="300" rows="3" data-tp="ph" placeholder="Ask it the way you&rsquo;d ask a friend"></textarea>
       <div class="count"><span id="n">0</span>/300</div>
     </form>
-    <button type="button" class="prompt" id="prompt"><span>Today&rsquo;s prompt</span><b id="prompt-q"></b></button>
-    <p class="hint">Questions for genuine reflection are recommended. Playful or nonsensical prompts may yield meaningless readings.</p>
-    <div class="foot"><button class="btn" form="ask" type="submit" id="next" disabled>Continue</button></div>
+    <button type="button" class="prompt" id="prompt"><span data-t="prompt">Today&rsquo;s prompt</span><b id="prompt-q"></b></button>
+    <p class="hint" data-t="hint">Questions for genuine reflection are recommended. Playful or nonsensical prompts may yield meaningless readings.</p>
+    <div class="foot"><button class="btn" form="ask" type="submit" id="next" disabled data-t="next">Continue</button></div>
   </section>
 
   <!-- 3. then how to read it -->
   <section class="screen" id="s-how" aria-labelledby="t-how">
-    <div class="top"><button class="back" data-go="ask">&larr; Back</button></div>
-    <h2 id="t-how">How should we read it?</h2>
+    <div class="top"><button class="back" data-go="ask" data-t="back">&larr; Back</button></div>
+    <h2 id="t-how" data-t="howH">How should we read it?</h2>
     <p class="echo" id="echo"></p>
     <div class="doors">
       <button class="door lace" data-way="iching">
         <span class="art" aria-hidden="true"><i class="coin heads"></i><i class="coin"></i><i class="coin heads"></i></span>
-        <span class="zh" id="zh-iching" aria-hidden="true">六爻</span><b>I Ching</b><small id="sub-iching"></small>
+        <span class="zh" id="zh-iching" aria-hidden="true">六爻</span><b id="b-iching">I Ching</b><small id="sub-iching"></small>
       </button>
       <button class="door lace" data-way="tarot">
         <span class="art minis" aria-hidden="true"><i class="cardback"></i><i class="cardback"></i><i class="cardback"></i></span>
-        <span class="zh" aria-hidden="true">塔罗</span><b>Tarot</b><small id="sub-tarot"></small>
+        <span class="zh" aria-hidden="true">塔罗</span><b data-t="tarot">Tarot</b><small id="sub-tarot"></small>
       </button>
     </div>
-    <label class="toggle"><input type="checkbox" id="yn" role="switch"><span class="track" aria-hidden="true"><i></i></span><span>Just a yes or no?</span></label>
+    <label class="toggle"><input type="checkbox" id="yn" role="switch"><span class="track" aria-hidden="true"><i></i></span><span data-t="yn">Just a yes or no?</span></label>
     <p class="toggle-note" id="yn-note"></p>
   </section>
 
   <!-- 4. the cast -->
   <section class="screen" id="s-cast" aria-labelledby="t-cast">
-    <div class="top"><button class="back" id="cast-back">&larr; Back</button></div>
+    <div class="top"><button class="back" id="cast-back" data-t="back">&larr; Back</button></div>
     <h2 id="t-cast"></h2>
     <p class="echo" id="cast-q"></p>
     <div class="stage" id="stage"></div>
@@ -324,7 +331,7 @@ button.star:hover svg{transform:scale(1.25)}
 
   <!-- 5. the keepsake -->
   <section class="screen" id="s-result" aria-labelledby="r-title">
-    <div class="top"><button class="back" data-go="start">&larr; Home</button></div>
+    <div class="top"><button class="back" data-go="start" data-t="home">&larr; Home</button></div>
     <article class="lace keep" aria-live="polite">
       <p class="date" id="r-date"></p>
       <p class="yourq" id="r-q"></p>
@@ -332,13 +339,13 @@ button.star:hover svg{transform:scale(1.25)}
       <p class="signname" id="r-name"></p>
       <h3 id="r-title"></h3>
       <p class="body" id="r-body"></p>
-      <div class="step" id="r-step"><span>Small step</span><p></p></div>
-      <details class="how"><summary>How this was cast</summary><p id="r-how"></p></details>
+      <div class="step" id="r-step"><span data-t="step">Small step</span><p></p></div>
+      <details class="how"><summary data-t="how">How this was cast</summary><p id="r-how"></p></details>
     </article>
-    <div class="actions"><button class="btn ghost" id="save">Save image</button><button class="btn" data-go="ask">Ask another</button></div>
+    <div class="actions"><button class="btn ghost" id="save" data-t="save">Save image</button><button class="btn" data-go="ask" data-t="again">Ask another</button></div>
     <div class="ritual" id="ritual-result" aria-live="polite"></div>
     <div class="a2hs" id="a2hs" hidden></div>
-    <p class="note">For reflection and fun. You already know more than you think.</p>
+    <p class="note" data-t="note">For reflection and fun. You already know more than you think.</p>
   </section>
 </main>
 
@@ -352,8 +359,109 @@ const save = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } cat
 const SPARK = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 0C11 7 13 9 20 10 13 11 11 13 10 20 9 13 7 11 0 10 7 9 9 7 10 0Z"/></svg>';
 const BRANCHES = '子丑寅卯辰巳午未申酉戌亥';
 const BACKS = [{ id: 'dots', name: 'Gold Polka' }, { id: 'stars', name: 'Starfield' }, { id: 'lace', name: 'Rose Lace' }, { id: 'moon', name: 'Moon Phase' }];
-const POSITIONS = { 'tarot-yesno': ['', '', ''], 'tarot-guidance': ['The core', 'The obstacle', 'What to do', 'Your strength'] };
 const state = { question: '', way: 'iching', yn: false, run: null };
+let lang = load('oracle.lang', navigator.language?.startsWith('zh') ? 'zh' : 'en');
+const VERDICT_ZH = { Yes: '是', 'Probably yes': '可能是', 'Probably no': '可能不是', No: '否' };
+// trigram by line bits bottom to top: [name, nature]
+const TRI = { '111': ['乾', '天'], '110': ['兑', '泽'], '101': ['离', '火'], '100': ['震', '雷'], '011': ['巽', '风'], '010': ['坎', '水'], '001': ['艮', '山'], '000': ['坤', '地'] };
+const tri = (lines) => [TRI[lines.slice(3).join('')], TRI[lines.slice(0, 3).join('')]];
+// traditional full name: 地天泰, or 乾为天 when both halves match
+const gua = (h) => { const [u, l] = tri(h.lines); return u[0] === l[0] ? `${u[0]}为${u[1]}` : `${u[1]}${l[1]}${h.zh}`; };
+const T = {
+  en: {
+    lang: '中文', locale: 'en-US', h1: 'Find your answer', sub: 'Find your quiet sign', start: 'Ask the oracle', about: 'What is this?',
+    aboutP: 'Discover soft, AI-powered guidance from Liu-Yao, ancient Chinese I Ching divination, and Tarot. When you feel unsure amid choices, get a small nudge to move forward.',
+    home: '&larr; Home', back: '&larr; Back', askH: 'What&rsquo;s on your mind?', ph: 'Ask it the way you’d ask a friend', prompt: 'Today&rsquo;s prompt',
+    hint: 'Questions for genuine reflection are recommended. Playful or nonsensical prompts may yield meaningless readings.', next: 'Continue',
+    howH: 'How should we read it?', tarot: 'Tarot', yn: 'Just a yes or no?', ynNote: 'Sounds like a yes or no question.',
+    iching: (yn) => 'I Ching', subI: (yn) => (yn ? 'Catch the exact second' : 'Toss three coins, six times'), subT: (yn) => (yn ? 'Three cards, counted upright' : 'Four cards, straight to the core'),
+    step: 'Small step', how: 'How this was cast', save: 'Save image', again: 'Ask another', note: 'For reflection and fun. You already know more than you think.',
+    today: 'Today&rsquo;s sign', retry: 'Try again', rev: 'Reversed', stepCaps: 'SMALL STEP', revCaps: 'REVERSED',
+    titles: { yesno: 'Catch the moment', guidance: 'Toss the coins', 'tarot-yesno': 'Pick three cards', 'tarot-guidance': 'Pick four cards' },
+    positions: ['The core', 'The obstacle', 'What to do', 'Your strength'],
+    coin0: 'Hold your question in mind, then tap the coins.<br>Six tosses, one line each.', coinN: (i) => `Line ${i} of 6. Tap again.`, coinDone: 'Your hexagram is here.',
+    dial0: 'Tap the dial when the moment feels right.<br>The exact second you choose casts your hexagram.', dialWait: 'Reading this moment&hellip;',
+    dialMoves: (c) => `Line ${c.moving} moves, turning toward ${esc(c.changed.name)}.`,
+    fan0: (n) => `Hold your question in mind, then pick ${n} cards.`, fanN: (k) => `${k} more`, flipping: 'Turning them over…',
+    hexName: (c) => `${c.n} · ${esc(c.name)}<span>${esc(c.zh)}</span>`, hexPlain: (c) => `${c.n} · ${c.name.toUpperCase()}  ${c.zh || ''}`,
+    verdict: (v) => v || '', cardName: (c) => [c.name, c.zh],
+    howText: {
+      yesno: (c) => `Cast from the moment you tapped: ${c.time}. Year, month, day, hour, minute and second pick the hexagram. Line ${c.moving} (marked) is moving, so it is turning into ${c.changed.n} · ${c.changed.name} ${c.changed.zh || ''}.`,
+      guidance: (c) => `Six tosses of three coins, bottom line first. Keywords: ${c.keywords}. ${c.advice}`,
+      'tarot-yesno': (c) => `Three cards from a 78-card deck. ${c.cards.filter((x) => !x.reversed).length} of 3 landed upright, which gives "${c.verdict}". ${c.cards.map((x) => `${x.name} ${x.zh}${x.reversed ? ', reversed' : ''}`).join('; ')}.`,
+      'tarot-guidance': (c) => c.cards.map((x, i) => `${T.en.positions[i]}: ${x.name} ${x.zh}${x.reversed ? ', reversed' : ''}`).join('. ') + '.',
+    },
+    todaySign: (s) => s.kind === 'hex' ? [`${s.n} · ${esc(s.name)}<span>${esc(s.zh)}</span>`, s.advice] : [`${esc(s.name)}<span>${esc(s.zh)}</span>`, s.up.charAt(0).toUpperCase() + s.up.slice(1) + '.'],
+    prompts: ['What am I ready to let go of?', 'Should I reach out to them this week?', 'Where should my energy go this week?', 'Is this opportunity worth a yes?',
+      'What is this relationship trying to teach me?', 'Should I rest this weekend instead of making plans?', 'What am I avoiding that needs my attention?',
+      'Is this the right time to ask for what I want at work?', 'How can I take better care of myself right now?', 'Should I trust my first instinct on this?',
+      'What would help me feel settled about my work?', 'Is it time to let this go?', 'What is the next step on the thing I keep putting off?', 'Is now a good time to start the project I keep thinking about?'],
+    backs: { dots: 'Gold Polka', stars: 'Starfield', lace: 'Rose Lace', moon: 'Moon Phase' }, backLabel: (n) => `${n} card back`,
+    reopen: (d) => `Reopen your reading from ${d}`, tapStar: ' Tap a star to reopen that day.',
+    ritual: {
+      done: (name) => `Your constellation${name ? ' of ' + esc(name) : ''} is complete. A new sky starts tomorrow.`,
+      fresh: (lit) => `Star ${lit} of 7 lit. Come back tomorrow to light the next one.`,
+      today: (lit) => `Today&rsquo;s star is lit. Come back tomorrow for star ${lit + 1}.`,
+      streak: (streak, lit) => `${streak}-day streak. Ask today to light star ${lit + 1}.`,
+      restart: 'Constellation complete. Ask today to start a new one.',
+      none: 'Ask once a day to light a star. Seven in a row make a constellation.',
+      reward: (name, back) => `Seven days in a row. You made the constellation of ${name}, the sign that came most this week. ` + (back ? `New card back unlocked: ${back}.` : 'Every card back is yours now.'),
+    },
+    a2hsIos: 'Make it a daily ritual: tap <b>Share</b>, then <b>Add to Home Screen</b>.', a2hs: 'Make it a daily ritual.', a2hsBtn: 'Add to Home Screen',
+  },
+  zh: {
+    lang: 'EN', locale: 'zh-CN', h1: '寻找你的答案', sub: '寻找你的静谧启示', start: '开始占问', about: '这是什么？',
+    aboutP: '借助 AI，从六爻（中国古老的易经占卜）与塔罗中获得温柔的指引。当你在选择面前犹豫不决时，给你一点继续前进的勇气。',
+    home: '&larr; 首页', back: '&larr; 返回', askH: '你想问什么？', ph: '像问朋友一样问出来', prompt: '今日提问',
+    hint: '建议提出真诚、值得思考的问题。随意或无意义的提问，可能得到没有意义的解读。', next: '继续',
+    howH: '用什么方式解读？', tarot: '塔罗', yn: '只想知道是或否？', ynNote: '听起来是个是非题。',
+    iching: (yn) => (yn ? '小六爻' : '六爻'), subI: (yn) => (yn ? '抓住此刻的那一秒' : '三枚铜钱，掷六次'), subT: (yn) => (yn ? '三张牌，看正逆位' : '四张牌，直指核心'),
+    step: '小小一步', how: '起卦方式', save: '保存图片', again: '再问一个', note: '仅供反思与娱乐。其实你知道的，比你以为的更多。',
+    today: '今日启示', retry: '再试一次', rev: '逆位', stepCaps: '小小一步', revCaps: '逆位',
+    titles: { yesno: '抓住此刻', guidance: '掷铜钱', 'tarot-yesno': '抽三张牌', 'tarot-guidance': '抽四张牌' },
+    positions: ['核心', '阻碍', '建议', '潜在优势'],
+    coin0: '心中默念你的问题，然后点击铜钱。<br>共掷六次，每次成一爻。', coinN: (i) => `第${i}爻，共六爻。再点一次。`, coinDone: '你的卦象已成。',
+    dial0: '在感觉对的时刻点击表盘。<br>你选中的那一秒，将起出你的卦。', dialWait: '正在解读此刻&hellip;',
+    dialMoves: (c) => `第${c.moving}爻为动爻，变为${esc(gua(c.changed))}。`,
+    fan0: (n) => `心中默念你的问题，然后抽${n}张牌。`, fanN: (k) => `还剩${k}张`, flipping: '正在翻牌…',
+    hexName: (c) => `第${c.n}卦 · ${esc(gua(c))}`, hexPlain: (c) => `第${c.n}卦 · ${gua(c)}`,
+    verdict: (v) => VERDICT_ZH[v] || '', cardName: (c) => [c.zh, c.name],
+    howText: {
+      yesno: (c) => `以你点击的时刻起卦：${c.time}。由年、月、日、时、分、秒得出卦象。第${c.moving}爻（已标记）为动爻，变为第${c.changed.n}卦 ${gua(c.changed)}。`,
+      guidance: (c) => { const [u, l] = tri(c.lines); return `三枚铜钱掷六次，自下而上成卦。上卦${u[0]}（${u[1]}），下卦${l[0]}（${l[1]}）。`; },
+      'tarot-yesno': (c) => `从78张牌中抽出三张，${c.cards.filter((x) => !x.reversed).length}张为正位，结果为「${VERDICT_ZH[c.verdict]}」。${c.cards.map((x) => `${x.zh}${x.reversed ? '（逆位）' : ''}`).join('、')}。`,
+      'tarot-guidance': (c) => c.cards.map((x, i) => `${T.zh.positions[i]}：${x.zh}${x.reversed ? '（逆位）' : ''}`).join('；') + '。',
+    },
+    todaySign: (s) => { if (s.kind !== 'hex') return [`${esc(s.zh)}<span>${esc(s.name)}</span>`, s.kw]; const [u, l] = tri(s.lines); return [`第${s.n}卦 · ${esc(gua(s))}`, `上卦${u[0]}（${u[1]}），下卦${l[0]}（${l[1]}）`]; },
+    prompts: ['我准备好放下什么了？', '这周我应该主动联系他们吗？', '这周我的精力应该放在哪里？', '这个机会值得答应吗？', '这段关系想教会我什么？',
+      '这个周末我应该休息，而不是安排计划吗？', '我在逃避什么需要正视的事情？', '现在是开口争取我想要的东西的好时机吗？', '现在我该如何更好地照顾自己？',
+      '在这件事上，我应该相信自己的第一直觉吗？', '什么能让我对工作感到更安定？', '是时候放下这件事了吗？', '我一直拖延的事情，下一步是什么？', '现在是开始那个一直想做的项目的好时机吗？'],
+    backs: { dots: '金色波点', stars: '星空', lace: '玫瑰蕾丝', moon: '月相' }, backLabel: (n) => `${n}牌背`,
+    reopen: (d) => `重温${d}的解读`, tapStar: '点击星星，可重温当天的解读。',
+    ritual: {
+      done: (name) => `你的${name ? '「' + esc(name) + '」' : ''}星座已完成。明天开启新的星空。`,
+      fresh: (lit) => `第${lit}颗星已点亮（共7颗）。明天再来点亮下一颗。`,
+      today: (lit) => `今天的星星已点亮。明天再来点亮第${lit + 1}颗。`,
+      streak: (streak, lit) => `已连续${streak}天。今天占问，即可点亮第${lit + 1}颗星。`,
+      restart: '星座已完成。今天占问，开启新的星座。',
+      none: '每天占问一次，点亮一颗星。连续七天，连成一个星座。',
+      reward: (name, back) => `连续七天。你点亮了「${name}」星座，这是本周出现最多的启示。` + (back ? `解锁新牌背：${back}。` : '所有牌背都已解锁。'),
+    },
+    a2hsIos: '把它变成每日仪式：点击<b>分享</b>，再选择<b>添加到主屏幕</b>。', a2hs: '把它变成每日仪式。', a2hsBtn: '添加到主屏幕',
+  },
+};
+const t = (k) => T[lang][k];
+const positions = (mode) => (mode === 'tarot-guidance' ? t('positions') : ['', '', '']);
+function applyLang() {
+  document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
+  document.querySelectorAll('[data-t]').forEach((el) => (el.innerHTML = t(el.dataset.t)));
+  document.querySelectorAll('[data-tp]').forEach((el) => (el.placeholder = t(el.dataset.tp)));
+  $('#lang').textContent = t('lang');
+  $('#prompt-q').textContent = todays(t('prompts'));
+  doors(); renderRitual($('#ritual-start')); renderBacks();
+  if (lastSign) renderToday(lastSign);
+  if ($('#s-result').classList.contains('on') && current) show(current, false, '', true);
+}
 
 function go(name) {
   document.querySelectorAll('.screen').forEach((s) => s.classList.toggle('on', s.id === 's-' + name));
@@ -393,10 +501,6 @@ function shoot() {
 // ---- daily ritual: one star per day asked, seven in a row make a constellation ----
 const dayKey = (d = new Date()) => d.toLocaleDateString('en-CA'); // local YYYY-MM-DD
 const todays = (list) => list[Math.floor(new Date(dayKey()).getTime() / 864e5) % list.length];
-const PROMPTS = ['What am I ready to let go of?', 'Should I reach out to them this week?', 'Where should my energy go this week?', 'Is this opportunity worth a yes?',
-  'What is this relationship trying to teach me?', 'Should I rest this weekend instead of making plans?', 'What am I avoiding that needs my attention?',
-  'Is this the right time to ask for what I want at work?', 'How can I take better care of myself right now?', 'Should I trust my first instinct on this?',
-  'What would help me feel settled about my work?', 'Is it time to let this go?', 'What is the next step on the thing I keep putting off?', 'Is now a good time to start the project I keep thinking about?'];
 function sky() {
   const days = new Set(load('oracle.days', [])), d = new Date(), today = days.has(dayKey(d));
   if (!today) d.setDate(d.getDate() - 1);
@@ -409,7 +513,7 @@ function recordToday() {
   if (days.includes(k)) return false;
   save('oracle.days', [...days, k].slice(-60)); return true;
 }
-const signName = (e) => (e.mode.startsWith('tarot') ? e.cast.cards[0].name : e.cast.name);
+const signName = (e) => (e.mode.startsWith('tarot') ? t('cardName')(e.cast.cards[0])[0] : lang === 'zh' ? gua(e.cast) : e.cast.name);
 function completeConstellation() {
   const week = Array.from({ length: 7 }, (_, i) => { const d = new Date(); d.setDate(d.getDate() - i); return dayKey(d); });
   const tally = {};
@@ -419,8 +523,7 @@ function completeConstellation() {
   save('oracle.constellations', list);
   const unlocked = BACKS[list.length];
   if (unlocked) { save('oracle.back', unlocked.id); applyBack(); }
-  return `Seven days in a row. You made the constellation of ${name}, the sign that came most this week. ` +
-    (unlocked ? `New card back unlocked: ${unlocked.name}.` : 'Every card back is yours now.');
+  return t('ritual').reward(name, unlocked && t('backs')[unlocked.id]);
 }
 function renderRitual(el, fresh, reward) {
   const { today, streak, lit } = sky();
@@ -432,25 +535,22 @@ function renderRitual(el, fresh, reward) {
     const cls = `star${i < lit ? ' lit' : ''}${fresh && i === lit - 1 ? ' new' : ''}`;
     if (i < lit && saved.has(dayKey(d))) {
       tappable++;
-      return `<button class="${cls}" data-day="${dayKey(d)}" aria-label="Reopen your reading from ${d.toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}">${SPARK}</button>`;
+      return `<button class="${cls}" data-day="${dayKey(d)}" aria-label="${t('reopen')(d.toLocaleDateString(t('locale'), { month: 'long', day: 'numeric' }))}">${SPARK}</button>`;
     }
     return `<span class="${cls}">${SPARK}</span>`;
   }).join('');
   const last = load('oracle.constellations', []).at(-1);
+  const m = t('ritual');
   const msg = reward ? `<span class="reward">${esc(reward)}</span>`
-    : today
-      ? lit === 7 ? `Your constellation${last ? ' of ' + esc(last.name) : ''} is complete. A new sky starts tomorrow.`
-        : fresh ? `Star ${lit} of 7 lit. Come back tomorrow to light the next one.`
-        : `Today&rsquo;s star is lit. Come back tomorrow for star ${lit + 1}.`
-      : streak ? (lit ? `${streak}-day streak. Ask today to light star ${lit + 1}.` : 'Constellation complete. Ask today to start a new one.')
-      : 'Ask once a day to light a star. Seven in a row make a constellation.';
-  el.innerHTML = `<div class="stars">${stars}</div><p>${msg}${tappable && !fresh && !reward ? ' Tap a star to reopen that day.' : ''}</p>`;
+    : today ? (lit === 7 ? m.done(last?.name) : fresh ? m.fresh(lit) : m.today(lit))
+    : streak ? (lit ? m.streak(streak, lit) : m.restart) : m.none;
+  el.innerHTML = `<div class="stars">${stars}</div><p>${msg}${tappable && !fresh && !reward ? t('tapStar') : ''}</p>`;
 }
 function applyBack() { document.body.dataset.back = load('oracle.back', 'dots'); }
 function renderBacks() {
   const n = Math.min(BACKS.length, 1 + load('oracle.constellations', []).length), el = $('#backs'), cur = load('oracle.back', 'dots');
   el.hidden = n < 2;
-  el.innerHTML = BACKS.slice(0, n).map((b) => `<button class="cardback bk-${b.id}" data-back="${b.id}" aria-pressed="${b.id === cur}" aria-label="${b.name} card back"></button>`).join('');
+  el.innerHTML = BACKS.slice(0, n).map((b) => `<button class="cardback bk-${b.id}" data-back="${b.id}" aria-pressed="${b.id === cur}" aria-label="${t('backLabel')(t('backs')[b.id])}"></button>`).join('');
 }
 $('#backs').addEventListener('click', (e) => { const b = e.target.closest('[data-back]'); if (b) { save('oracle.back', b.dataset.back); applyBack(); renderBacks(); } });
 
@@ -461,16 +561,21 @@ async function loadToday() {
   if (s?.day !== dayKey()) {
     try { s = await (await fetch('/api/daily?d=' + dayKey())).json(); save('oracle.sign', s); } catch { return; }
   }
+  renderToday(s);
+}
+let lastSign = null;
+function renderToday(s) {
+  lastSign = s;
   const dc = $('#daycard');
   dc.className = 'daycard faceup';
   dc.innerHTML = s.kind === 'hex' ? `${hexHTML(s.lines)}<span class="zh">${esc(s.zh)}</span>` : `<b>${esc(s.glyph)}</b><span class="zh">${esc(s.zh)}</span>`;
-  const line = s.kind === 'hex' ? s.advice : s.up.charAt(0).toUpperCase() + s.up.slice(1) + '.';
-  $('#today').innerHTML = `<p class="lbl">Today&rsquo;s sign</p><p class="nm">${s.kind === 'hex' ? s.n + ' · ' : ''}${esc(s.name)}<span>${esc(s.zh)}</span></p><p class="ad">${esc(line)}</p>`;
+  const [nm, line] = t('todaySign')(s);
+  $('#today').innerHTML = `<p class="lbl">${t('today')}</p><p class="nm">${nm}</p><p class="ad">${esc(line)}</p>`;
 }
 
 // ---- ask, then choose how ----
 const YN = /^(should|will|is|are|am|do|does|did|can|could|would|was|were|has|have|shall|may|must)\b/i;
-$('#prompt-q').textContent = todays(PROMPTS);
+const YN_ZH = /吗[？?]?\s*$|是否|会不会|要不要|该不该|能不能|可不可以|是不是|有没有/;
 $('#prompt').addEventListener('click', () => { const q = $('#q'); q.value = $('#prompt-q').textContent; q.dispatchEvent(new Event('input')); q.focus(); });
 $('#q').addEventListener('input', (e) => { $('#n').textContent = e.target.value.length; $('#next').disabled = !e.target.value.trim(); });
 $('#q').addEventListener('keydown', (e) => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) $('#ask').requestSubmit(); });
@@ -478,22 +583,23 @@ $('#ask').addEventListener('submit', (e) => {
   e.preventDefault();
   state.question = $('#q').value.trim();
   if (!state.question) return;
-  state.yn = YN.test(state.question); // guess from the wording; the toggle can change it
+  state.yn = YN.test(state.question) || YN_ZH.test(state.question); // guess from the wording; the toggle can change it
   $('#yn').checked = state.yn; $('#echo').textContent = `“${state.question}”`;
   doors(); go('how');
 });
 $('#yn').addEventListener('change', (e) => { state.yn = e.target.checked; doors(); });
 function doors() {
   $('#zh-iching').textContent = state.yn ? '小六爻' : '六爻';
-  $('#sub-iching').textContent = state.yn ? 'Catch the exact second' : 'Toss three coins, six times';
-  $('#sub-tarot').textContent = state.yn ? 'Three cards, counted upright' : 'Four cards, straight to the core';
-  $('#yn-note').textContent = state.yn ? 'Sounds like a yes or no question.' : '';
+  $('#b-iching').textContent = t('iching')(state.yn);
+  $('#sub-iching').textContent = t('subI')(state.yn);
+  $('#sub-tarot').textContent = t('subT')(state.yn);
+  $('#yn-note').textContent = state.yn ? t('ynNote') : '';
 }
 const modeOf = () => (state.way === 'tarot' ? 'tarot-' : '') + (state.yn ? 'yesno' : 'guidance');
 function ask(mode, extra = {}) {
   return fetch('/api/read', {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ mode, question: state.question, timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone, ...extra }),
+    body: JSON.stringify({ mode, question: state.question, timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone, lang, ...extra }),
   }).then(async (res) => {
     const d = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(d.error || 'The oracle is quiet right now. Try again in a moment.');
@@ -506,14 +612,14 @@ const once = (el) => new Promise((r) => el.addEventListener('click', r, { once: 
 $('#cast-back').addEventListener('click', () => { state.run = null; go('how'); });
 function cast() {
   const mode = modeOf(), run = (state.run = {});
-  $('#t-cast').textContent = { yesno: 'Catch the moment', guidance: 'Toss the coins', 'tarot-yesno': 'Pick three cards', 'tarot-guidance': 'Pick four cards' }[mode];
+  $('#t-cast').textContent = t('titles')[mode];
   $('#cast-q').textContent = `“${state.question}”`;
   $('#instr').innerHTML = '';
   go('cast');
   const ritual = mode === 'yesno' ? dial : mode === 'guidance' ? coins : fan;
   ritual(run, mode).catch((err) => {
     if (run !== state.run) return;
-    $('#stage').innerHTML = `<p class="err">${esc(err.message)}</p><button class="btn" style="width:auto;padding:12px 26px" id="retry">Try again</button>`;
+    $('#stage').innerHTML = `<p class="err">${esc(err.message)}</p><button class="btn" style="width:auto;padding:12px 26px" id="retry">${t('retry')}</button>`;
     $('#instr').textContent = '';
     $('#retry').onclick = cast;
   });
@@ -526,7 +632,7 @@ async function coins(run, mode) {
   const rows = document.querySelectorAll('#stage .ln'), btn = $('#toss'), cs = btn.querySelectorAll('.coin');
   let data;
   for (let i = 0; i < 6; i++) {
-    $('#instr').innerHTML = i ? `Line ${i + 1} of 6. Tap again.` : 'Hold your question in mind, then tap the coins.<br>Six tosses, one line each.';
+    $('#instr').innerHTML = i ? t('coinN')(i + 1) : t('coin0');
     await once(btn);
     if (run !== state.run) return;
     btn.disabled = true;
@@ -539,7 +645,7 @@ async function coins(run, mode) {
     btn.disabled = false;
   }
   btn.disabled = true;
-  $('#instr').innerHTML = `<b>${data.cast.n} · ${esc(data.cast.name)} ${esc(data.cast.zh)}</b>Your hexagram is here.`;
+  $('#instr').innerHTML = `<b>${t('hexName')(data.cast)}</b>${t('coinDone')}`;
   shoot(); await sleep(reduced ? 300 : 1400);
   if (run === state.run) finish(data, mode);
 }
@@ -549,7 +655,7 @@ async function dial(run, mode) {
       <span class="ring" aria-hidden="true">${[...BRANCHES].map((b, k) => `<b style="--a:${k * 30}deg">${b}</b>`).join('')}</span>
       <i class="hand h"></i><i class="hand s"></i><span class="clock" id="clock"></span></button>
     <div class="hex" id="d-hex" hidden></div>`;
-  $('#instr').innerHTML = 'Tap the dial when the moment feels right.<br>The exact second you choose casts your hexagram.';
+  $('#instr').innerHTML = t('dial0');
   const el = $('#dial'), branches = el.querySelectorAll('.ring b');
   const tick = (t = new Date()) => {
     const h = t.getHours(), m = t.getMinutes(), s = t.getSeconds();
@@ -562,27 +668,27 @@ async function dial(run, mode) {
   await once(el);
   const at = Date.now(); clearInterval(iv); tick(new Date(at));
   el.classList.add('caught'); el.disabled = true; shoot();
-  $('#instr').innerHTML = `<b>${$('#clock').textContent}</b>Reading this moment&hellip;`;
+  $('#instr').innerHTML = `<b>${$('#clock').textContent}</b>${t('dialWait')}`;
   const data = await ask(mode, { at });
   if (run !== state.run) return;
   const c = data.cast, hx = $('#d-hex');
   hx.hidden = false; hx.innerHTML = '<div class="ln slot"><i></i><i></i></div>'.repeat(6);
   $('#instr').innerHTML = `<b>${esc(c.time)}</b>`;
   for (let i = 0; i < 6; i++) { hx.children[i].className = `ln ${c.lines[i] ? 'yang' : 'yin'} land${i === c.moving - 1 ? ' moving' : ''}`; await sleep(reduced ? 0 : 160); }
-  $('#instr').innerHTML = `<b>${c.n} · ${esc(c.name)} ${esc(c.zh)}</b>Line ${c.moving} moves, turning toward ${esc(c.changed.name)}.`;
+  $('#instr').innerHTML = `<b>${t('hexName')(c)}</b>${t('dialMoves')(c)}`;
   await sleep(reduced ? 300 : 1800);
   if (run === state.run) finish(data, mode);
 }
 // tarot: the deck fans out, the user picks, the cards turn over one by one
-const cardHTML = (c, label = '') => `<div class="tc${c.reversed ? ' rev' : ''}"><small>${esc(label)}</small><div class="face"><b>${esc(c.glyph)}</b><span>${esc(c.name)}</span><span class="zh">${esc(c.zh)}</span></div><em>${c.reversed ? 'Reversed' : ''}</em></div>`;
+const cardHTML = (c, label = '') => { const [a, b] = t('cardName')(c); return `<div class="tc${c.reversed ? ' rev' : ''}"><small>${esc(label)}</small><div class="face"><b>${esc(c.glyph)}</b><span>${esc(a)}</span><span class="zh">${esc(b)}</span></div><em>${c.reversed ? t('rev') : ''}</em></div>`; };
 async function fan(run, mode) {
   const pending = ask(mode); pending.catch(() => {});
-  const labels = POSITIONS[mode], n = labels.length;
+  const labels = positions(mode), n = labels.length;
   $('#stage').innerHTML = `<div class="slots" style="--n:${n}">${labels.map((l) => `<div class="tc empty"><small>${l}</small><div class="face"></div><em></em></div>`).join('')}</div>
     <div class="fan" id="fan">${Array.from({ length: 15 }, (_, i) => `<button class="fc cardback" style="--i:${i - 7}" aria-label="Card ${i + 1}"></button>`).join('')}</div>`;
   const slots = [...document.querySelectorAll('#stage .tc')], deck = $('#fan');
   for (let i = 0; i < n; i++) {
-    $('#instr').textContent = i ? `${n - i} more` : `Hold your question in mind, then pick ${n} cards.`;
+    $('#instr').textContent = i ? t('fanN')(n - i) : t('fan0')(n);
     const card = await new Promise((r) => deck.addEventListener('click', function h(e) {
       const b = e.target.closest('.fc'); if (!b || b.disabled) return; deck.removeEventListener('click', h); r(b);
     }));
@@ -591,7 +697,7 @@ async function fan(run, mode) {
     slots[i].className = 'tc back';
   }
   deck.querySelectorAll('.fc').forEach((b) => (b.disabled = true));
-  $('#instr').textContent = 'Turning them over…';
+  $('#instr').textContent = t('flipping');
   const data = await pending;
   if (run !== state.run) return;
   for (const [i, c] of data.cast.cards.entries()) {
@@ -599,13 +705,13 @@ async function fan(run, mode) {
     await sleep(reduced ? 0 : 420);
   }
   shoot();
-  $('#instr').innerHTML = data.cast.verdict ? `<b>${esc(data.cast.verdict)}</b>` : '';
+  $('#instr').innerHTML = data.cast.verdict ? `<b>${esc(t('verdict')(data.cast.verdict))}</b>` : '';
   await sleep(reduced ? 300 : 1600);
   if (run === state.run) finish(data, mode);
 }
 
 // ---- the keepsake ----
-let image = null;
+let image = null, current = null;
 function finish(data, mode) {
   const e = { ts: Date.now(), day: dayKey(), question: state.question, mode, cast: data.cast, reading: data.reading };
   save('oracle.readings', [...load('oracle.readings', []), e].slice(-60));
@@ -615,26 +721,23 @@ function finish(data, mode) {
   $('#q').value = ''; $('#n').textContent = '0'; $('#next').disabled = true;
   maybeA2HS();
 }
-function show(e, fresh = false, reward = '') {
+function show(e, fresh = false, reward = '', relabel = false) {
+  current = e;
   const tarot = e.mode.startsWith('tarot'), c = e.cast, r = e.reading;
-  $('#r-date').textContent = new Date(e.ts).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+  $('#r-date').textContent = new Date(e.ts).toLocaleDateString(t('locale'), { month: 'long', day: 'numeric', year: 'numeric' });
   $('#r-q').textContent = `“${e.question}”`;
   $('#r-sign').innerHTML = tarot
-    ? `<div class="slots" style="--n:${c.cards.length}">${c.cards.map((x, i) => cardHTML(x, POSITIONS[e.mode][i])).join('')}</div>`
+    ? `<div class="slots" style="--n:${c.cards.length}">${c.cards.map((x, i) => cardHTML(x, positions(e.mode)[i])).join('')}</div>`
     : `<span class="wm${c.zh?.length > 1 ? ' two' : ''}" aria-hidden="true">${esc(c.zh)}</span>${hexHTML(c.lines, e.mode === 'yesno' ? c.moving : 0)}`;
-  $('#r-name').innerHTML = tarot ? esc(c.verdict || '') : `${c.n} · ${esc(c.name)}<span>${esc(c.zh)}</span>`;
+  $('#r-name').innerHTML = tarot ? esc(t('verdict')(c.verdict)) : t('hexName')(c);
   $('#r-name').hidden = tarot && !c.verdict;
   $('#r-title').textContent = r.title;
   $('#r-body').textContent = r.body; $('#r-body').hidden = !r.body;
   $('#r-step p').textContent = r.step; $('#r-step').hidden = !r.step;
-  $('#r-how').textContent = {
-    yesno: () => `Cast from the moment you tapped: ${c.time}. Year, month, day, hour, minute and second pick the hexagram. Line ${c.moving} (marked) is moving, so it is turning into ${c.changed.n} · ${c.changed.name} ${c.changed.zh || ''}.`,
-    guidance: () => `Six tosses of three coins, bottom line first. Keywords: ${c.keywords}. ${c.advice}`,
-    'tarot-yesno': () => `Three cards from a 78-card deck. ${c.cards.filter((x) => !x.reversed).length} of 3 landed upright, which gives "${c.verdict}". ${c.cards.map((x) => `${x.name} ${x.zh}${x.reversed ? ', reversed' : ''}`).join('; ')}.`,
-    'tarot-guidance': () => c.cards.map((x) => `${x.position}: ${x.name} ${x.zh}${x.reversed ? ', reversed' : ''}`).join('. ') + '.',
-  }[e.mode]();
-  renderRitual($('#ritual-result'), fresh, reward);
+  $('#r-how').textContent = t('howText')[e.mode](c);
   image = renderImage(e).catch((err) => { console.error(err); return null; });
+  if (relabel) return; // language swap on an open result: keep the ritual message and scroll position
+  renderRitual($('#ritual-result'), fresh, reward);
   go('result');
 }
 function openDay(day) {
@@ -652,20 +755,24 @@ $('#save').addEventListener('click', async () => {
 });
 
 // Story-sized (1080x1920) image of the keepsake, drawn on a canvas so it looks the same on every phone.
+const SANS = 'Jost, "Noto Serif SC", sans-serif', SERIF = '"Instrument Serif", "Noto Serif SC", serif';
 const SPARK_PATH = 'M10 0C11 7 13 9 20 10 13 11 11 13 10 20 9 13 7 11 0 10 7 9 9 7 10 0Z';
+// breaks between words, or between any two Chinese characters, but never before punctuation
 function wrap(x, text, w) {
   const out = []; let line = '';
-  for (const word of String(text).split(/\s+/)) {
-    const t = line ? line + ' ' + word : word;
-    if (x.measureText(t).width > w && line) { out.push(line); line = word; } else line = t;
+  for (const tok of String(text).match(/[\u2E80-\u9FFF\u3000-\u303F\uFF00-\uFFEF]|[^\s\u2E80-\u9FFF\u3000-\u303F\uFF00-\uFFEF]+|\s+/g) || []) {
+    const next = line + tok;
+    if (x.measureText(next.trim()).width > w && line.trim() && !/^[，。、；：？！」』）》,.;:!?]/.test(tok)) { out.push(line.trim()); line = tok.trimStart(); } else line = next;
   }
-  if (line) out.push(line);
+  if (line.trim()) out.push(line.trim());
   return out;
 }
 async function renderImage(e) {
   const tarot = e.mode.startsWith('tarot'), c = e.cast, r = e.reading;
+  const all = [e.question, r.title, r.body, r.step, c.zh, ...(c.cards || []).map((x) => x.zh), t('stepCaps'), t('revCaps'), ...t('positions'), tarot ? '' : t('hexPlain')(c), new Date(e.ts).toLocaleDateString(t('locale'), { month: 'long', day: 'numeric', year: 'numeric' })].join('');
   await Promise.all([['italic 72px "Instrument Serif"'], ['400 72px "Instrument Serif"'], ['400 30px Jost'], ['500 20px Jost'],
-    ['500 60px "Noto Serif SC"', (c.zh || '') + (c.cards || []).map((x) => x.zh).join('')]].map(([f, t]) => document.fonts.load(f, t || '六').catch(() => {})));
+    ['400 60px "Noto Serif SC"', all], ['500 60px "Noto Serif SC"', all]].map(([f, s]) => document.fonts.load(f, s || '六').catch(() => {})));
+  const it = lang === 'zh' ? '' : 'italic '; // no fake-italic Chinese
   const W = 1080, H = 1920, cv = document.createElement('canvas'); cv.width = W; cv.height = H;
   const x = cv.getContext('2d'), spark = new Path2D(SPARK_PATH);
   const star = (cx, cy, s, col) => { x.save(); x.translate(cx - s, cy - s); x.scale(s / 10, s / 10); x.fillStyle = col; x.fill(spark); x.restore(); };
@@ -684,17 +791,17 @@ async function renderImage(e) {
     blocks = [];
     const text = (font, color, str, lh, opts = {}) => { x.font = font; x.letterSpacing = opts.ls || '0px'; let lines = wrap(x, str, IW); if (opts.max) lines = lines.slice(0, opts.max); blocks.push({ k: 'text', font, color, lines, lh, ls: opts.ls, h: lines.length * lh }); };
     const gap = (h) => blocks.push({ k: 'gap', h });
-    text('500 22px Jost', '#6f6888', new Date(e.ts).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }).toUpperCase(), 30, { ls: '6px' });
-    gap(20); text('italic 40px "Instrument Serif"', '#6f6888', `“${e.question}”`, 48, { max: 3 });
+    text(`500 22px ${SANS}`, '#6f6888', new Date(e.ts).toLocaleDateString(t('locale'), { month: 'long', day: 'numeric', year: 'numeric' }).toUpperCase(), 30, { ls: '6px' });
+    gap(20); text(`${it}40px ${SERIF}`, '#6f6888', `“${e.question}”`, 48, { max: 3 });
     gap(26);
     if (tarot) { const n = c.cards.length, cw = Math.min(176, (IW - (n - 1) * 22) / n); blocks.push({ k: 'cards', cw, ch: cw * 1.6, h: cw * 1.6 + (e.mode === 'tarot-guidance' ? 44 : 0) + 34 }); }
     else blocks.push({ k: 'hex', h: 6 * 26 + 5 * 24 + 40 });
-    const name = tarot ? c.verdict || '' : `${c.n} · ${c.name.toUpperCase()}  ${c.zh || ''}`;
-    if (name) { gap(16); text('400 32px "Instrument Serif"', '#6f6888', name, 40, { ls: '4px' }); }
-    gap(30); text('italic 80px "Instrument Serif"', '#2b2740', r.title, 86);
-    if (r.body) { gap(26); text(`400 ${bs}px Jost`, '#2b2740', r.body, Math.round(bs * 1.5)); }
+    const name = tarot ? t('verdict')(c.verdict) : t('hexPlain')(c);
+    if (name) { gap(16); text(`400 32px ${SERIF}`, '#6f6888', name, 40, { ls: '4px' }); }
+    gap(30); text(`${it}${lang === 'zh' ? 66 : 80}px ${SERIF}`, '#2b2740', r.title, 86);
+    if (r.body) { gap(26); text(`400 ${bs}px ${SANS}`, '#2b2740', r.body, Math.round(bs * 1.5)); }
     if (r.step) {
-      x.font = '400 30px Jost'; x.letterSpacing = '0px';
+      x.font = `400 30px ${SANS}`; x.letterSpacing = '0px';
       const lines = wrap(x, r.step, IW - 64);
       gap(34); blocks.push({ k: 'step', lines, h: 36 + 30 + 12 + lines.length * 44 + 32 });
     }
@@ -732,24 +839,25 @@ async function renderImage(e) {
       const cs = c.cards, span = cs.length * b.cw + (cs.length - 1) * 22, labels = e.mode === 'tarot-guidance';
       cs.forEach((card, i) => {
         const cx = mid - span / 2 + i * (b.cw + 22), cy = y + (labels ? 44 : 0);
-        if (labels) { x.font = '500 18px Jost'; x.letterSpacing = '2px'; x.fillStyle = '#6f6888'; x.fillText(card.position.toUpperCase(), cx + b.cw / 2, y + 16); x.letterSpacing = '0px'; }
+        if (labels) { x.font = `500 18px ${SANS}`; x.letterSpacing = '2px'; x.fillStyle = '#6f6888'; x.fillText(t('positions')[i].toUpperCase(), cx + b.cw / 2, y + 16); x.letterSpacing = '0px'; }
         x.save(); x.translate(cx + b.cw / 2, cy + b.ch / 2); if (card.reversed) x.rotate(Math.PI);
         x.fillStyle = card.reversed ? '#f3ead6' : '#fff'; x.strokeStyle = '#d8c9a8'; x.lineWidth = 2;
         x.beginPath(); x.roundRect(-b.cw / 2, -b.ch / 2, b.cw, b.ch, 14); x.fill(); x.stroke();
         x.fillStyle = '#a8822f'; x.font = '400 56px "Instrument Serif"'; x.fillText(card.glyph, 0, -b.ch * .2);
-        x.fillStyle = '#2b2740'; x.font = '400 24px "Instrument Serif"';
-        wrap(x, card.name, b.cw - 20).slice(0, 3).forEach((l, k) => x.fillText(l, 0, b.ch * .08 + k * 26));
-        x.fillStyle = '#6f6888'; x.font = '400 20px "Noto Serif SC"'; x.fillText(card.zh, 0, b.ch * .38);
+        const [p1, p2] = t('cardName')(card);
+        x.fillStyle = '#2b2740'; x.font = `400 24px ${SERIF}`;
+        wrap(x, p1, b.cw - 20).slice(0, 3).forEach((l, k) => x.fillText(l, 0, b.ch * .08 + k * 26));
+        x.fillStyle = '#6f6888'; x.font = `400 ${lang === 'zh' ? 15 : 20}px ${SERIF}`; x.fillText(p2, 0, b.ch * .38);
         x.restore();
-        if (card.reversed) { x.font = '500 16px Jost'; x.letterSpacing = '2px'; x.fillStyle = '#a8822f'; x.fillText('REVERSED', cx + b.cw / 2, cy + b.ch + 20); x.letterSpacing = '0px'; }
+        if (card.reversed) { x.font = `500 16px ${SANS}`; x.letterSpacing = '2px'; x.fillStyle = '#a8822f'; x.fillText(t('revCaps'), cx + b.cw / 2, cy + b.ch + 20); x.letterSpacing = '0px'; }
       });
     } else if (b.k === 'step') {
       x.fillStyle = '#f3ead6'; x.beginPath(); x.roundRect(CX + P, y, IW, b.h, 26); x.fill();
       x.strokeStyle = '#a8822f'; x.setLineDash([6, 6]); x.lineWidth = 2; x.stroke(); x.setLineDash([]);
-      x.font = '500 20px Jost'; x.letterSpacing = '5px'; x.fillStyle = '#a8822f'; x.fillText('SMALL STEP', mid + 14, y + 51);
-      const lw = x.measureText('SMALL STEP').width; x.letterSpacing = '0px';
+      x.font = `500 20px ${SANS}`; x.letterSpacing = '5px'; x.fillStyle = '#a8822f'; x.fillText(t('stepCaps'), mid + 14, y + 51);
+      const lw = x.measureText(t('stepCaps')).width; x.letterSpacing = '0px';
       star(mid + 14 - lw / 2 - 22, y + 51, 10, '#a8822f');
-      x.font = '400 30px Jost'; x.fillStyle = '#2b2740';
+      x.font = `400 30px ${SANS}`; x.fillStyle = '#2b2740';
       b.lines.forEach((l, i) => x.fillText(l, mid, y + 36 + 30 + 12 + i * 44 + 22));
     }
     y += b.h;
@@ -769,13 +877,14 @@ function maybeA2HS() {
   const ios = /iphone|ipad|ipod/i.test(navigator.userAgent);
   if (!ios && !installEvt) return;
   el.hidden = false;
-  el.innerHTML = ios ? '<p>Make it a daily ritual: tap <b>Share</b>, then <b>Add to Home Screen</b>.</p><button class="x" aria-label="Dismiss">&times;</button>'
-    : '<p>Make it a daily ritual.</p><button class="btn" id="install">Add to Home Screen</button><button class="x" aria-label="Dismiss">&times;</button>';
+  el.innerHTML = ios ? `<p>${t('a2hsIos')}</p><button class="x" aria-label="Dismiss">&times;</button>`
+    : `<p>${t('a2hs')}</p><button class="btn" id="install">${t('a2hsBtn')}</button><button class="x" aria-label="Dismiss">&times;</button>`;
   el.querySelector('.x').onclick = () => { el.hidden = true; save('oracle.a2hs', true); };
   el.querySelector('#install')?.addEventListener('click', async () => { installEvt.prompt(); await installEvt.userChoice; installEvt = null; el.hidden = true; save('oracle.a2hs', true); });
 }
 
-applyBack(); renderRitual($('#ritual-start')); renderBacks(); loadToday(); doors();
+$('#lang').addEventListener('click', () => { lang = lang === 'zh' ? 'en' : 'zh'; save('oracle.lang', lang); applyLang(); });
+applyBack(); applyLang(); loadToday();
 </script>
 </body>
 </html>

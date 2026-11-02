@@ -17,20 +17,24 @@ function limited(ip) {
 }
 
 const json = (body, status = 200) => Response.json(body, { status });
+const ERR = {
+  en: { rest: 'The oracle needs a rest. Come back in a little while.', ask: 'Ask a question first.', quiet: 'The oracle is quiet right now. Try again in a moment.' },
+  zh: { rest: '神谕需要休息一下，请稍后再来。', ask: '请先写下你的问题。', quiet: '神谕此刻沉默了，请稍后再试。' },
+};
 
 export async function POST(request) {
-  const ip = (request.headers.get('x-forwarded-for') || 'local').split(',')[0].trim();
-  if (limited(ip)) return json({ error: 'The oracle needs a rest. Come back in a little while.' }, 429);
-
   let body;
   try {
     body = await request.json();
   } catch {
     return json({ error: 'Bad request' }, 400);
   }
+  const lang = body.lang === 'zh' ? 'zh' : 'en';
+  const ip = (request.headers.get('x-forwarded-for') || 'local').split(',')[0].trim();
+  if (limited(ip)) return json({ error: ERR[lang].rest }, 429);
   const question = String(body.question || '').trim().slice(0, 300);
   const mode = ['yesno', 'guidance', 'tarot-yesno', 'tarot-guidance'].includes(body.mode) ? body.mode : 'guidance';
-  if (!question) return json({ error: 'Ask a question first.' }, 400);
+  if (!question) return json({ error: ERR[lang].ask }, 400);
 
   let timeZone = 'UTC';
   try {
@@ -61,13 +65,13 @@ export async function POST(request) {
       betas: ['server-side-fallback-2026-07-01'],
       fallbacks: 'default',
       system: SYSTEM_PROMPT,
-      messages: [{ role: 'user', content: userPrompt(mode, cast, question, askedAt) }],
+      messages: [{ role: 'user', content: userPrompt(mode, cast, question, askedAt, lang) }],
     });
     if (res.stop_reason !== 'refusal') text = res.content.filter((b) => b.type === 'text').map((b) => b.text).join('');
     if (!text) console.error('anthropic', res.stop_reason, JSON.stringify(res.stop_details));
   } catch (err) {
     console.error('anthropic', err.status, err.message);
   }
-  if (!text) return json({ error: 'The oracle is quiet right now. Try again in a moment.' }, 502);
+  if (!text) return json({ error: ERR[lang].quiet }, 502);
   return json({ mode, cast, reading: parseReading(text) });
 }

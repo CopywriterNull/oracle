@@ -1,0 +1,6 @@
+{
+  "name": "oracle",
+  "private": true,
+  "type": "module",
+  "scripts": { "test": "node lib/oracle.test.js" }
+}

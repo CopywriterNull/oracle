@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Oracle</title>
+<meta name="description" content="Find your answer. A quiet I Ching reading for the questions you already half know.">
+<meta name="theme-color" content="#f8f3ec">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500&family=Noto+Serif+SC:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#f8f3ec; --card:#fffdf9; --ink:#3a332e; --muted:#8a7f76; --line:#d9cbbd;
+  --rose:#e9c9c3; --rose-deep:#b06f72; --sage:#cfdfc9; --sage-deep:#6f8a68;
+  --serif:'Cormorant Garamond',Georgia,serif; --sans:'Jost',system-ui,sans-serif; --zh:'Noto Serif SC',serif;
+}
+*{box-sizing:border-box;margin:0}
+body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-weight:300;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(circle at 20% 0%,#f3e4dc 0,transparent 45%),radial-gradient(circle at 100% 100%,#e8efe2 0,transparent 40%)}
+main{max-width:440px;margin:0 auto;min-height:100dvh;padding:20px 20px calc(24px + env(safe-area-inset-bottom));display:flex;flex-direction:column}
+.screen{display:none;flex:1;flex-direction:column;animation:fade .45s ease both}
+.screen.on{display:flex}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.top{height:40px;display:flex;align-items:center}
+.back{background:none;border:0;color:var(--muted);font:inherit;font-size:15px;padding:8px 8px 8px 0;cursor:pointer}
+.back:focus-visible,.btn:focus-visible,.mode:focus-visible,textarea:focus-visible{outline:2px solid var(--rose-deep);outline-offset:3px}
+h1,h2{font-family:var(--serif);font-weight:500;letter-spacing:.01em;text-align:center}
+h1{font-size:56px;line-height:1}
+h2{font-size:34px;margin:8px 0 24px}
+.sub{text-align:center;color:var(--muted);font-family:var(--serif);font-style:italic;font-size:20px;margin-top:6px}
+
+/* lace card */
+.lace{position:relative;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:28px 22px;
+  box-shadow:0 1px 0 #fff inset,0 18px 40px -24px rgba(90,60,40,.35)}
+.lace::before{content:"";position:absolute;inset:7px;border:1px solid var(--line);border-radius:9px;pointer-events:none;
+  -webkit-mask:radial-gradient(circle at 0 0,#0000 14px,#000 15px) top left/51% 51% no-repeat,radial-gradient(circle at 100% 0,#0000 14px,#000 15px) top right/51% 51% no-repeat,radial-gradient(circle at 0 100%,#0000 14px,#000 15px) bottom left/51% 51% no-repeat,radial-gradient(circle at 100% 100%,#0000 14px,#000 15px) bottom right/51% 51% no-repeat;
+  mask:radial-gradient(circle at 0 0,#0000 14px,#000 15px) top left/51% 51% no-repeat,radial-gradient(circle at 100% 0,#0000 14px,#000 15px) top right/51% 51% no-repeat,radial-gradient(circle at 0 100%,#0000 14px,#000 15px) bottom left/51% 51% no-repeat,radial-gradient(circle at 100% 100%,#0000 14px,#000 15px) bottom right/51% 51% no-repeat}
+.lace::after{content:"";position:absolute;left:18px;right:18px;top:-6px;height:12px;
+  background:radial-gradient(circle at 6px 6px,var(--card) 4.5px,var(--line) 5px,transparent 5.5px) 0 0/12px 12px repeat-x;pointer-events:none}
+
+.hero{flex:1;display:flex;flex-direction:column;justify-content:center;gap:34px;padding:10px 0}
+.hero .lace{margin:0 auto;width:min(240px,70vw);aspect-ratio:3/4.2;display:grid;place-items:center}
+
+/* hexagram lines */
+.hex{display:flex;flex-direction:column-reverse;gap:10px;width:120px}
+.ln{height:9px;display:flex;justify-content:space-between}
+.ln i{display:block;height:100%;background:var(--ink);border-radius:2px;flex:1;transition:flex .35s ease,background .35s,opacity .35s}
+.ln i+i{margin-left:0}
+.ln.yin i:first-child{flex:.44} .ln.yin i:last-child{flex:.44}
+.ln.yin{gap:12%}
+.ln.wait i{background:var(--line);animation:shimmer 1.2s ease-in-out infinite}
+.ln.wait i:last-child{display:none}
+@keyframes shimmer{50%{opacity:.35}}
+.hero .hex .ln i{background:var(--rose-deep);opacity:.75}
+
+.btn{display:block;width:100%;border:1px solid rgba(58,51,46,.18);border-radius:999px;padding:16px;font:inherit;font-size:17px;font-weight:400;letter-spacing:.06em;
+  color:var(--ink);background:var(--rose);cursor:pointer;transition:transform .15s,box-shadow .15s;box-shadow:0 8px 20px -14px rgba(176,111,114,.9)}
+.btn:active{transform:scale(.98)}
+.btn.sage{background:var(--sage);box-shadow:0 8px 20px -14px rgba(111,138,104,.9)}
+.btn:disabled{opacity:.5;cursor:default}
+.foot{margin-top:auto;padding-top:20px}
+
+/* modes */
+.modes{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+[hidden]{display:none!important}
+.mode{font:inherit;color:inherit;cursor:pointer;text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px;padding:26px 14px 22px;transition:transform .15s}
+.mode:active{transform:scale(.98)}
+.mode .zh{font-family:var(--zh);font-size:30px;color:var(--rose-deep)}
+.mode b{font-family:var(--serif);font-weight:600;font-size:22px}
+.mode small{color:var(--muted);font-size:13px;line-height:1.35}
+.mode.wide{grid-column:1/-1}
+.mode[aria-disabled=true]{cursor:default;opacity:.55}
+.tag{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--sage-deep);border:1px solid var(--sage);border-radius:99px;padding:3px 10px}
+
+/* question */
+.qcard{padding:22px}
+.qlabel{display:block;font-family:var(--serif);font-style:italic;font-size:18px;color:var(--muted);margin-bottom:10px}
+textarea{width:100%;min-height:150px;border:0;resize:none;background:transparent;font:inherit;font-size:18px;line-height:1.5;color:var(--ink)}
+textarea::placeholder{color:#b9aea4}
+.count{text-align:right;font-size:12px;color:var(--muted)}
+.hint{color:var(--muted);font-size:14px;line-height:1.5;text-align:center;margin-top:18px;padding:0 10px}
+
+/* result */
+.result{text-align:center;display:flex;flex-direction:column;align-items:center;gap:16px;padding:30px 22px 26px}
+.castname{font-family:var(--serif);font-size:15px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);min-height:1.2em}
+.palace{font-family:var(--zh);font-size:54px;line-height:1.1;color:var(--rose-deep);min-height:60px;transition:opacity .2s}
+.verdict{font-family:var(--serif);font-size:18px;font-style:italic}
+.reading{opacity:0;transition:opacity .6s ease;display:flex;flex-direction:column;gap:14px}
+.reading.on{opacity:1}
+.reading h3{font-family:var(--serif);font-weight:500;font-size:28px;line-height:1.15}
+.reading p{font-size:16.5px;line-height:1.65;text-align:left}
+.step{background:#f6ece6;border-radius:10px;padding:12px 14px;font-size:15px;line-height:1.5;text-align:left}
+.step span{display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--rose-deep);margin-bottom:4px}
+.yourq{font-family:var(--serif);font-style:italic;color:var(--muted);font-size:17px;line-height:1.4}
+.err{color:var(--rose-deep)}
+.note{font-size:12px;color:var(--muted);text-align:center;margin-top:14px}
+.row{display:flex;gap:10px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<main>
+  <!-- 1. start -->
+  <section class="screen on" id="s-start" aria-labelledby="t-start">
+    <div class="hero">
+      <div>
+        <h1 id="t-start">Oracle</h1>
+        <p class="sub">find your answer</p>
+      </div>
+      <div class="lace" aria-hidden="true"><div class="hex" id="hero-hex"></div></div>
+    </div>
+    <div class="foot"><button class="btn sage" data-go="mode">Start</button></div>
+  </section>
+
+  <!-- 2. mode -->
+  <section class="screen" id="s-mode" aria-labelledby="t-mode">
+    <div class="top"><button class="back" data-go="start">&larr; Back</button></div>
+    <h2 id="t-mode">Choose a mode</h2>
+    <div class="modes">
+      <button class="mode lace" data-mode="yesno">
+        <span class="zh" aria-hidden="true">小六爻</span><b>Yes / No</b><small>A quick, clear answer when you're stuck</small>
+      </button>
+      <button class="mode lace" data-mode="guidance">
+        <span class="zh" aria-hidden="true">六爻</span><b>Guidance</b><small>Short advice from your hexagram</small>
+      </button>
+      <div class="mode lace wide" aria-disabled="true">
+        <b>Tarot</b><small>A card-based reading</small><span class="tag">Coming soon</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. question -->
+  <section class="screen" id="s-ask" aria-labelledby="t-ask">
+    <div class="top"><button class="back" data-go="mode">&larr; Back</button></div>
+    <h2 id="t-ask">Your question</h2>
+    <form id="ask" class="lace qcard">
+      <label class="qlabel" for="q" id="qlabel">Ask it the way you'd ask a friend</label>
+      <textarea id="q" maxlength="300" required placeholder="Should I text them first?"></textarea>
+      <div class="count"><span id="n">0</span>/300</div>
+    </form>
+    <p class="hint" id="hint">Hold the question in your mind for a breath, then send.</p>
+    <div class="foot"><button class="btn" form="ask" type="submit">Send</button></div>
+  </section>
+
+  <!-- 4. result -->
+  <section class="screen" id="s-result" aria-labelledby="t-result">
+    <div class="top"><button class="back" data-go="ask">&larr; Back</button></div>
+    <h2 id="t-result">Your result</h2>
+    <div class="lace result" aria-live="polite">
+      <p class="yourq" id="r-q"></p>
+      <div class="hex" id="r-hex" hidden></div>
+      <div class="palace" id="r-palace" hidden></div>
+      <p class="castname" id="r-name">Casting&hellip;</p>
+      <div class="reading" id="r-reading"></div>
+    </div>
+    <div class="foot"><button class="btn" data-go="mode" id="again">Again</button></div>
+    <p class="note">For reflection and fun. You already know more than you think.</p>
+  </section>
+</main>
+
+<script>
+const $ = (s) => document.querySelector(s);
+const PALACES = ['大安','留连','速喜','赤口','小吉','空亡'];
+const state = { mode: 'guidance' };
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function go(name) {
+  document.querySelectorAll('.screen').forEach((s) => s.classList.toggle('on', s.id === 's-' + name));
+  window.scrollTo(0, 0);
+  if (name === 'ask') setTimeout(() => $('#q').focus(), 50);
+}
+document.addEventListener('click', (e) => {
+  const g = e.target.closest('[data-go]'); if (g) go(g.dataset.go);
+  const m = e.target.closest('[data-mode]');
+  if (m) {
+    state.mode = m.dataset.mode;
+    $('#qlabel').textContent = state.mode === 'yesno' ? 'Ask something with a yes or no answer' : "Ask it the way you'd ask a friend";
+    $('#q').placeholder = state.mode === 'yesno' ? 'Will they reach out this week?' : 'What should I focus on with my career right now?';
+    go('ask');
+  }
+});
+
+function drawHex(el, lines, wait) {
+  el.innerHTML = lines.map((l) => `<div class="ln ${wait ? 'wait' : l ? 'yang' : 'yin'}"><i></i><i></i></div>`).join('');
+}
+drawHex($('#hero-hex'), [1, 0, 0, 0, 1, 1]);
+
+$('#q').addEventListener('input', (e) => ($('#n').textContent = e.target.value.length));
+$('#q').addEventListener('keydown', (e) => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) $('#ask').requestSubmit(); });
+
+$('#ask').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const question = $('#q').value.trim();
+  if (!question) return;
+  const yesno = state.mode === 'yesno';
+  const hex = $('#r-hex'), palace = $('#r-palace'), reading = $('#r-reading');
+  $('#r-q').textContent = '“' + question + '”';
+  $('#r-name').textContent = 'Casting…';
+  reading.className = 'reading'; reading.innerHTML = '';
+  hex.hidden = yesno; palace.hidden = !yesno;
+  if (!yesno) drawHex(hex, Array(6).fill(0), true);
+  go('result');
+
+  let spin;
+  if (yesno) { let i = 0; spin = setInterval(() => (palace.textContent = PALACES[i++ % 6]), 140); }
+
+  let data;
+  try {
+    const [res] = await Promise.all([
+      fetch('/api/read', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode: state.mode, question, timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone }) }),
+      sleep(reduced ? 0 : 1400),
+    ]);
+    data = await res.json();
+    if (!res.ok) throw new Error(data.error);
+  } catch (err) {
+    clearInterval(spin);
+    palace.hidden = hex.hidden = true;
+    $('#r-name').textContent = '';
+    reading.innerHTML = `<p class="err">${esc(err.message || 'The oracle is quiet right now. Try again in a moment.')}</p>`;
+    reading.className = 'reading on';
+    return;
+  }
+
+  const { cast, reading: r } = data;
+  if (yesno) {
+    clearInterval(spin);
+    palace.textContent = cast.zh;
+    $('#r-name').innerHTML = `${esc(cast.en)} · ${esc(cast.hourName)}<br><span class="verdict">${esc(cast.verdict)}</span>`;
+  } else {
+    // reveal lines bottom to top, like six tosses
+    const rows = hex.querySelectorAll('.ln');
+    for (let i = 0; i < 6; i++) { rows[i].className = 'ln ' + (cast.lines[i] ? 'yang' : 'yin'); if (!reduced) await sleep(170); }
+    $('#r-name').textContent = `${cast.n} · ${cast.name}`;
+  }
+  reading.innerHTML = `<h3>${esc(r.title)}</h3>${r.body ? `<p>${esc(r.body)}</p>` : ''}` +
+    (r.step ? `<div class="step"><span>Small step</span>${esc(r.step)}</div>` : '');
+  requestAnimationFrame(() => (reading.className = 'reading on'));
+  $('#q').value = ''; $('#n').textContent = '0';
+});
+
+function esc(s) { return String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]); }
+</script>
+</body>
+</html>

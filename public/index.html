@@ -268,7 +268,7 @@ $('#ask').addEventListener('submit', async (e) => {
       const el = els[i];
       el.querySelector('small').textContent = state.mode === 'tarot-yesno' ? '' : c.position;
       el.querySelector('b').textContent = c.glyph;
-      el.querySelector('span').textContent = c.name;
+      el.querySelector('span').innerText = `${c.name}\n${c.zh}`;
       el.querySelector('em').textContent = c.reversed ? 'Reversed' : '';
       el.className = 'tc' + (c.reversed ? ' rev' : '');
       if (!reduced) await sleep(260);
